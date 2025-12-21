@@ -81,11 +81,35 @@
             font-weight: 700;
         }
 
-        .toolbar {
+        .mode-tabs {
             display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            justify-content: center;
+            background: var(--bg-primary);
+            border-radius: var(--radius);
+            padding: 4px;
+            gap: 4px;
+        }
+
+        .mode-tab {
+            padding: 8px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: var(--font-sans);
+            color: var(--text-secondary);
+            background: transparent;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+
+        .mode-tab:hover {
+            color: var(--text-primary);
+            background: var(--bg-hover);
+        }
+
+        .mode-tab.active {
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
         }
 
         .btn {
@@ -213,6 +237,7 @@
         .panel-actions {
             display: flex;
             gap: 4px;
+            flex-wrap: wrap;
         }
 
         .panel-btn {
@@ -224,11 +249,114 @@
             cursor: pointer;
             border-radius: var(--radius-sm);
             transition: all var(--transition);
+            white-space: nowrap;
         }
 
         .panel-btn:hover {
             background: var(--bg-hover);
             color: var(--text-primary);
+        }
+
+        /* Diff Mode Styles */
+        .diff-inputs {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .diff-input-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .diff-input-section:last-child {
+            border-bottom: none;
+        }
+
+        .diff-input-header {
+            padding: 8px 16px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: var(--bg-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .diff-editor {
+            flex: 1;
+            min-height: 0;
+        }
+
+        .diff-container {
+            padding: 16px;
+            font-family: var(--font-mono);
+            font-size: 13px;
+        }
+
+        .diff-stats {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .diff-line {
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+            margin: 2px 0;
+            display: flex;
+            gap: 12px;
+        }
+
+        .diff-line.added {
+            background: rgba(63, 185, 80, 0.15);
+            color: var(--accent-green);
+        }
+
+        .diff-line.removed {
+            background: rgba(248, 81, 73, 0.15);
+            color: var(--accent-red);
+        }
+
+        .diff-line.changed {
+            background: rgba(210, 153, 34, 0.15);
+            color: var(--accent-orange);
+        }
+
+        .diff-line.unchanged {
+            color: var(--text-muted);
+        }
+
+        .diff-path {
+            color: var(--text-secondary);
+            min-width: 200px;
+        }
+
+        .diff-prefix {
+            font-weight: 700;
+            width: 16px;
+            flex-shrink: 0;
+        }
+
+        .diff-value {
+            flex: 1;
+            word-break: break-all;
+        }
+
+        .diff-section {
+            margin-bottom: 16px;
+        }
+
+        .diff-section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .panel-content {
@@ -828,28 +956,9 @@
             <span>JSON Tool</span>
         </div>
         
-        <div class="toolbar">
-            <button class="btn btn-primary" id="pasteBtn" title="Paste from clipboard (Ctrl+V)">
-                📋 Paste
-            </button>
-            <button class="btn" id="formatBtn" title="Format JSON (Ctrl+Shift+F)">
-                ✨ Format
-            </button>
-            <button class="btn" id="minifyBtn" title="Minify JSON">
-                📦 Minify
-            </button>
-            <button class="btn" id="copyBtn" title="Copy to clipboard (Ctrl+C)">
-                📄 Copy
-            </button>
-            <button class="btn" id="downloadBtn" title="Download as file">
-                💾 Download
-            </button>
-            <button class="btn" id="clearBtn" title="Clear all">
-                🗑️ Clear
-            </button>
-            <button class="btn" id="sampleBtn" title="Load sample JSON">
-                📝 Sample
-            </button>
+        <div class="mode-tabs">
+            <button class="mode-tab active" data-mode="explorer">Explorer</button>
+            <button class="mode-tab" data-mode="diff">Diff Viewer</button>
         </div>
 
         <div class="status">
@@ -866,16 +975,26 @@
     </div>
 
     <main class="main-container">
-        <section class="panel panel-left">
+        <section class="panel panel-left" id="panelLeft">
             <div class="panel-header">
-                <span class="panel-title">Raw JSON</span>
-                <div class="panel-actions">
-                    <button class="panel-btn" id="wrapBtn">Wrap</button>
-                    <button class="panel-btn" id="undoBtn">Undo</button>
-                    <button class="panel-btn" id="redoBtn">Redo</button>
+                <span class="panel-title" id="leftPanelTitle">Raw JSON</span>
+                <div class="panel-actions" id="explorerActions">
+                    <button class="panel-btn" id="pasteBtn" title="Paste">📋 Paste</button>
+                    <button class="panel-btn" id="formatBtn" title="Format">✨ Format</button>
+                    <button class="panel-btn" id="minifyBtn" title="Minify">📦 Minify</button>
+                    <button class="panel-btn" id="copyBtn" title="Copy">📄 Copy</button>
+                    <button class="panel-btn" id="downloadBtn" title="Download">💾 Download</button>
+                    <button class="panel-btn" id="clearBtn" title="Clear">🗑️ Clear</button>
+                    <button class="panel-btn" id="sampleBtn" title="Sample">📝 Sample</button>
+                </div>
+                <div class="panel-actions" id="diffActions" style="display: none;">
+                    <button class="panel-btn" id="swapBtn" title="Swap">⇄ Swap</button>
+                    <button class="panel-btn" id="clearDiffBtn" title="Clear">🗑️ Clear</button>
                 </div>
             </div>
-            <div class="panel-content">
+            
+            <!-- Explorer Mode Content -->
+            <div class="panel-content" id="explorerContent">
                 <div class="editor-wrapper">
                     <textarea 
                         class="editor" 
@@ -885,7 +1004,30 @@
                     ></textarea>
                 </div>
             </div>
-            <div class="stats-bar">
+            
+            <!-- Diff Mode Content -->
+            <div class="diff-inputs" id="diffContent" style="display: none;">
+                <div class="diff-input-section">
+                    <div class="diff-input-header">Original JSON</div>
+                    <textarea 
+                        class="editor diff-editor" 
+                        id="diffEditorLeft" 
+                        placeholder="Paste original JSON here..."
+                        spellcheck="false"
+                    ></textarea>
+                </div>
+                <div class="diff-input-section">
+                    <div class="diff-input-header">Modified JSON</div>
+                    <textarea 
+                        class="editor diff-editor" 
+                        id="diffEditorRight" 
+                        placeholder="Paste modified JSON here..."
+                        spellcheck="false"
+                    ></textarea>
+                </div>
+            </div>
+            
+            <div class="stats-bar" id="statsBar">
                 <div class="stat-item">
                     <span>Size:</span>
                     <span class="stat-value" id="sizeValue">0 B</span>
@@ -903,15 +1045,16 @@
 
         <div class="resizer" id="resizer"></div>
 
-        <section class="panel panel-right">
-            <div class="panel-header">
+        <section class="panel panel-right" id="panelRight">
+            <!-- Explorer Mode Header -->
+            <div class="panel-header" id="explorerRightHeader">
                 <span class="panel-title">Tree View</span>
                 <div class="panel-actions">
                     <button class="panel-btn" id="expandAllBtn">Expand All</button>
                     <button class="panel-btn" id="collapseAllBtn">Collapse All</button>
                 </div>
             </div>
-            <div class="search-container">
+            <div class="search-container" id="searchContainer">
                 <input 
                     type="text" 
                     class="search-input" 
@@ -919,7 +1062,7 @@
                     placeholder="Search keys or values... (Ctrl+F)"
                 >
             </div>
-            <div class="panel-content scrollable">
+            <div class="panel-content scrollable" id="explorerRightContent">
                 <div class="tree-container" id="treeContainer">
                     <div class="empty-state" id="emptyState">
                         <div class="empty-state-icon">{ }</div>
@@ -929,9 +1072,27 @@
                     </div>
                 </div>
             </div>
-            <div class="path-display">
+            <div class="path-display" id="pathDisplay">
                 <span class="path-display-label">Path:</span>
                 <span class="path-display-value" id="pathValue">$</span>
+            </div>
+            
+            <!-- Diff Mode Header -->
+            <div class="panel-header" id="diffRightHeader" style="display: none;">
+                <span class="panel-title">Differences</span>
+                <div class="panel-actions">
+                    <span class="diff-stats" id="diffStats"></span>
+                </div>
+            </div>
+            <div class="panel-content scrollable" id="diffRightContent" style="display: none;">
+                <div class="diff-container" id="diffContainer">
+                    <div class="empty-state" id="diffEmptyState">
+                        <div class="empty-state-icon">⇄</div>
+                        <div class="empty-state-text">
+                            Paste JSON in both panels to see the differences
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
     </main>
@@ -954,15 +1115,13 @@
         class JSONTool {
             constructor() {
                 this.jsonData = null;
-                this.history = [];
-                this.historyIndex = -1;
-                this.maxHistory = 50;
                 this.isUpdating = false;
                 this.clipboardJSON = null;
                 this.currentPath = '$';
                 this.contextMenuTarget = null;
                 this.clipboardChecked = false;
                 this.clipboardPermissionDenied = false;
+                this.currentMode = 'explorer';
 
                 this.initElements();
                 this.initEventListeners();
@@ -989,6 +1148,28 @@
                 this.sizeValue = document.getElementById('sizeValue');
                 this.linesValue = document.getElementById('linesValue');
                 this.depthValue = document.getElementById('depthValue');
+
+                // Mode elements
+                this.modeTabs = document.querySelectorAll('.mode-tab');
+                this.explorerContent = document.getElementById('explorerContent');
+                this.diffContent = document.getElementById('diffContent');
+                this.explorerActions = document.getElementById('explorerActions');
+                this.diffActions = document.getElementById('diffActions');
+                this.explorerRightHeader = document.getElementById('explorerRightHeader');
+                this.explorerRightContent = document.getElementById('explorerRightContent');
+                this.diffRightHeader = document.getElementById('diffRightHeader');
+                this.diffRightContent = document.getElementById('diffRightContent');
+                this.searchContainer = document.getElementById('searchContainer');
+                this.pathDisplay = document.getElementById('pathDisplay');
+                this.statsBar = document.getElementById('statsBar');
+                this.leftPanelTitle = document.getElementById('leftPanelTitle');
+
+                // Diff elements
+                this.diffEditorLeft = document.getElementById('diffEditorLeft');
+                this.diffEditorRight = document.getElementById('diffEditorRight');
+                this.diffContainer = document.getElementById('diffContainer');
+                this.diffEmptyState = document.getElementById('diffEmptyState');
+                this.diffStats = document.getElementById('diffStats');
             }
 
             // Initialize event listeners
@@ -1009,9 +1190,19 @@
                 // Panel buttons
                 document.getElementById('expandAllBtn').addEventListener('click', () => this.expandAll());
                 document.getElementById('collapseAllBtn').addEventListener('click', () => this.collapseAll());
-                document.getElementById('wrapBtn').addEventListener('click', () => this.toggleWrap());
-                document.getElementById('undoBtn').addEventListener('click', () => this.undo());
-                document.getElementById('redoBtn').addEventListener('click', () => this.redo());
+
+                // Diff buttons
+                document.getElementById('swapBtn').addEventListener('click', () => this.swapDiffInputs());
+                document.getElementById('clearDiffBtn').addEventListener('click', () => this.clearDiff());
+
+                // Mode tabs
+                this.modeTabs.forEach(tab => {
+                    tab.addEventListener('click', () => this.switchMode(tab.dataset.mode));
+                });
+
+                // Diff editors
+                this.diffEditorLeft.addEventListener('input', () => this.handleDiffInput());
+                this.diffEditorRight.addEventListener('input', () => this.handleDiffInput());
 
                 // Clipboard banner
                 document.getElementById('pasteClipboardBtn').addEventListener('click', () => this.pasteDetectedJSON());
@@ -1029,6 +1220,229 @@
                 // Context menu
                 document.addEventListener('click', () => this.hideContextMenu());
                 this.contextMenu.addEventListener('click', (e) => this.handleContextMenuClick(e));
+            }
+
+            // ============================================
+            // Mode Switching
+            // ============================================
+
+            switchMode(mode) {
+                if (this.currentMode === mode) return;
+                this.currentMode = mode;
+
+                // Update tabs
+                this.modeTabs.forEach(tab => {
+                    tab.classList.toggle('active', tab.dataset.mode === mode);
+                });
+
+                if (mode === 'explorer') {
+                    this.explorerContent.style.display = '';
+                    this.diffContent.style.display = 'none';
+                    this.explorerActions.style.display = '';
+                    this.diffActions.style.display = 'none';
+                    this.explorerRightHeader.style.display = '';
+                    this.explorerRightContent.style.display = '';
+                    this.diffRightHeader.style.display = 'none';
+                    this.diffRightContent.style.display = 'none';
+                    this.searchContainer.style.display = '';
+                    this.pathDisplay.style.display = '';
+                    this.statsBar.style.display = '';
+                    this.leftPanelTitle.textContent = 'Raw JSON';
+                    this.setStatus('', 'Ready');
+                } else {
+                    this.explorerContent.style.display = 'none';
+                    this.diffContent.style.display = '';
+                    this.explorerActions.style.display = 'none';
+                    this.diffActions.style.display = '';
+                    this.explorerRightHeader.style.display = 'none';
+                    this.explorerRightContent.style.display = 'none';
+                    this.diffRightHeader.style.display = '';
+                    this.diffRightContent.style.display = '';
+                    this.searchContainer.style.display = 'none';
+                    this.pathDisplay.style.display = 'none';
+                    this.statsBar.style.display = 'none';
+                    this.leftPanelTitle.textContent = 'Compare JSON';
+                    this.setStatus('', 'Diff Mode');
+                    this.handleDiffInput();
+                }
+            }
+
+            // ============================================
+            // Diff Functionality
+            // ============================================
+
+            handleDiffInput() {
+                const leftText = this.diffEditorLeft.value;
+                const rightText = this.diffEditorRight.value;
+
+                if (!leftText.trim() || !rightText.trim()) {
+                    this.showDiffEmpty();
+                    return;
+                }
+
+                const leftResult = this.parseJSON(leftText);
+                const rightResult = this.parseJSON(rightText);
+
+                if (!leftResult.success || !rightResult.success) {
+                    this.showDiffError(leftResult, rightResult);
+                    return;
+                }
+
+                const diffs = this.compareJSON(leftResult.data, rightResult.data);
+                this.renderDiff(diffs);
+            }
+
+            compareJSON(obj1, obj2, path = '$') {
+                const diffs = [];
+
+                const allKeys = new Set([
+                    ...Object.keys(obj1 || {}),
+                    ...Object.keys(obj2 || {})
+                ]);
+
+                for (const key of allKeys) {
+                    const currentPath = Array.isArray(obj1) || Array.isArray(obj2) 
+                        ? `${path}[${key}]` 
+                        : `${path}.${key}`;
+                    
+                    const val1 = obj1?.[key];
+                    const val2 = obj2?.[key];
+
+                    if (!(key in (obj1 || {}))) {
+                        diffs.push({ type: 'added', path: currentPath, value: val2 });
+                    } else if (!(key in (obj2 || {}))) {
+                        diffs.push({ type: 'removed', path: currentPath, value: val1 });
+                    } else if (typeof val1 === 'object' && val1 !== null && 
+                               typeof val2 === 'object' && val2 !== null) {
+                        diffs.push(...this.compareJSON(val1, val2, currentPath));
+                    } else if (val1 !== val2) {
+                        diffs.push({ type: 'changed', path: currentPath, oldValue: val1, newValue: val2 });
+                    }
+                }
+
+                return diffs;
+            }
+
+            renderDiff(diffs) {
+                this.diffEmptyState.style.display = 'none';
+
+                if (diffs.length === 0) {
+                    this.diffContainer.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">✓</div>
+                            <div class="empty-state-text">No differences found - JSON objects are identical</div>
+                        </div>
+                    `;
+                    this.diffStats.textContent = 'No changes';
+                    this.setStatus('valid', 'Identical');
+                    return;
+                }
+
+                const added = diffs.filter(d => d.type === 'added');
+                const removed = diffs.filter(d => d.type === 'removed');
+                const changed = diffs.filter(d => d.type === 'changed');
+
+                this.diffStats.textContent = `+${added.length} -${removed.length} ~${changed.length}`;
+                this.setStatus('invalid', `${diffs.length} difference${diffs.length > 1 ? 's' : ''}`);
+
+                let html = '';
+
+                if (added.length > 0) {
+                    html += `<div class="diff-section">
+                        <div class="diff-section-title">Added (${added.length})</div>
+                        ${added.map(d => `
+                            <div class="diff-line added">
+                                <span class="diff-prefix">+</span>
+                                <span class="diff-path">${d.path}</span>
+                                <span class="diff-value">${this.formatDiffValue(d.value)}</span>
+                            </div>
+                        `).join('')}
+                    </div>`;
+                }
+
+                if (removed.length > 0) {
+                    html += `<div class="diff-section">
+                        <div class="diff-section-title">Removed (${removed.length})</div>
+                        ${removed.map(d => `
+                            <div class="diff-line removed">
+                                <span class="diff-prefix">−</span>
+                                <span class="diff-path">${d.path}</span>
+                                <span class="diff-value">${this.formatDiffValue(d.value)}</span>
+                            </div>
+                        `).join('')}
+                    </div>`;
+                }
+
+                if (changed.length > 0) {
+                    html += `<div class="diff-section">
+                        <div class="diff-section-title">Changed (${changed.length})</div>
+                        ${changed.map(d => `
+                            <div class="diff-line changed">
+                                <span class="diff-prefix">~</span>
+                                <span class="diff-path">${d.path}</span>
+                                <span class="diff-value">${this.formatDiffValue(d.oldValue)} → ${this.formatDiffValue(d.newValue)}</span>
+                            </div>
+                        `).join('')}
+                    </div>`;
+                }
+
+                this.diffContainer.innerHTML = html;
+            }
+
+            formatDiffValue(value) {
+                if (value === null) return '<em>null</em>';
+                if (typeof value === 'string') return `"${this.escapeHtml(value)}"`;
+                if (typeof value === 'object') return Array.isArray(value) 
+                    ? `[${value.length} items]` 
+                    : `{${Object.keys(value).length} keys}`;
+                return String(value);
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            showDiffEmpty() {
+                this.diffContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⇄</div>
+                        <div class="empty-state-text">
+                            Paste JSON in both panels to see the differences
+                        </div>
+                    </div>
+                `;
+                this.diffStats.textContent = '';
+                this.setStatus('', 'Diff Mode');
+            }
+
+            showDiffError(leftResult, rightResult) {
+                this.diffEmptyState.style.display = 'none';
+                let errorMsg = '';
+                if (!leftResult.success) errorMsg += `Original: ${leftResult.error}\n`;
+                if (!rightResult.success) errorMsg += `Modified: ${rightResult.error}`;
+                
+                this.diffContainer.innerHTML = `
+                    <div class="error-display">❌ Parse Error:\n${errorMsg}</div>
+                `;
+                this.diffStats.textContent = 'Error';
+                this.setStatus('invalid', 'Parse Error');
+            }
+
+            swapDiffInputs() {
+                const temp = this.diffEditorLeft.value;
+                this.diffEditorLeft.value = this.diffEditorRight.value;
+                this.diffEditorRight.value = temp;
+                this.handleDiffInput();
+                this.showToast('Inputs swapped', 'success');
+            }
+
+            clearDiff() {
+                this.diffEditorLeft.value = '';
+                this.diffEditorRight.value = '';
+                this.handleDiffInput();
+                this.showToast('Cleared', 'info');
             }
 
             // ============================================
@@ -1093,7 +1507,6 @@
                     this.jsonData = result.data;
                     this.setStatus('valid', 'Valid JSON' + (result.fixed ? ' (auto-fixed)' : ''));
                     this.renderTree();
-                    this.saveToHistory(text);
                 } else if (text.trim()) {
                     this.jsonData = null;
                     this.setStatus('invalid', 'Invalid JSON');
@@ -1412,7 +1825,6 @@
                 this.isUpdating = true;
                 this.editor.value = JSON.stringify(this.jsonData, null, 2);
                 this.updateStats(this.editor.value);
-                this.saveToHistory(this.editor.value);
                 this.isUpdating = false;
             }
 
@@ -1536,7 +1948,6 @@
                 this.isUpdating = true;
                 this.editor.value = JSON.stringify(this.jsonData, null, 2);
                 this.updateStats(this.editor.value);
-                this.saveToHistory(this.editor.value);
                 this.isUpdating = false;
                 this.showToast('JSON formatted', 'success');
             }
@@ -1550,7 +1961,6 @@
                 this.isUpdating = true;
                 this.editor.value = JSON.stringify(this.jsonData);
                 this.updateStats(this.editor.value);
-                this.saveToHistory(this.editor.value);
                 this.isUpdating = false;
                 this.showToast('JSON minified', 'success');
             }
@@ -1688,54 +2098,6 @@
                 });
                 
                 children.forEach(c => c.classList.add('collapsed'));
-            }
-
-            toggleWrap() {
-                const isWrapped = this.editor.style.whiteSpace === 'pre-wrap';
-                this.editor.style.whiteSpace = isWrapped ? 'pre' : 'pre-wrap';
-                this.editor.style.wordBreak = isWrapped ? 'normal' : 'break-word';
-            }
-
-            // ============================================
-            // History (Undo/Redo)
-            // ============================================
-
-            saveToHistory(text) {
-                // Remove future history if we're not at the end
-                if (this.historyIndex < this.history.length - 1) {
-                    this.history = this.history.slice(0, this.historyIndex + 1);
-                }
-
-                // Don't save duplicates
-                if (this.history[this.history.length - 1] === text) return;
-
-                this.history.push(text);
-                
-                if (this.history.length > this.maxHistory) {
-                    this.history.shift();
-                }
-                
-                this.historyIndex = this.history.length - 1;
-            }
-
-            undo() {
-                if (this.historyIndex > 0) {
-                    this.historyIndex--;
-                    this.isUpdating = true;
-                    this.editor.value = this.history[this.historyIndex];
-                    this.isUpdating = false;
-                    this.handleEditorInput();
-                }
-            }
-
-            redo() {
-                if (this.historyIndex < this.history.length - 1) {
-                    this.historyIndex++;
-                    this.isUpdating = true;
-                    this.editor.value = this.history[this.historyIndex];
-                    this.isUpdating = false;
-                    this.handleEditorInput();
-                }
             }
 
             // ============================================
