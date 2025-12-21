@@ -39,12 +39,16 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            height: 100%;
+        }
+
         body {
             font-family: var(--font-sans);
             background: var(--bg-primary);
             color: var(--text-primary);
-            height: 100vh;
-            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         /* Header */
@@ -197,7 +201,8 @@
         /* Main Container */
         .main-container {
             display: flex;
-            height: calc(100vh - 57px);
+            flex: 1;
+            min-height: 0;
         }
 
         /* Panels */
@@ -928,7 +933,6 @@
 
             .main-container {
                 flex-direction: column;
-                height: calc(100vh - 120px);
             }
 
             .panel {
@@ -1863,25 +1867,14 @@
             // ============================================
 
             async checkClipboard() {
-                // Only check once, and don't retry if permission was denied
-                if (this.clipboardChecked || this.clipboardPermissionDenied) return;
+                // Only check once
+                if (this.clipboardChecked) return;
                 this.clipboardChecked = true;
 
                 try {
-                    // Check if clipboard-read permission is available
-                    if (navigator.permissions) {
-                        const permissionStatus = await navigator.permissions.query({ name: 'clipboard-read' });
-                        if (permissionStatus.state === 'denied') {
-                            this.clipboardPermissionDenied = true;
-                            return;
-                        }
-                        // Only proceed if already granted, don't prompt
-                        if (permissionStatus.state !== 'granted') {
-                            return;
-                        }
-                    }
-
                     const text = await navigator.clipboard.readText();
+                    if (!text || !text.trim()) return;
+                    
                     const result = this.parseJSON(text);
                     
                     if (result.success) {
@@ -1890,8 +1883,7 @@
                         this.clipboardBanner.classList.add('show');
                     }
                 } catch (e) {
-                    // Clipboard access denied or empty - don't show banner, don't retry
-                    this.clipboardPermissionDenied = true;
+                    // Clipboard access denied or empty - silently fail
                 }
             }
 
