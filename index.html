@@ -645,39 +645,41 @@
         .clipboard-banner {
             display: none;
             align-items: center;
-            justify-content: center;
             gap: 12px;
-            padding: 12px 20px;
+            padding: 10px 20px;
             background: linear-gradient(135deg, rgba(88, 166, 255, 0.1), rgba(163, 113, 247, 0.1));
             border-bottom: 1px solid var(--border-color);
-            animation: slideDown 0.3s ease;
         }
 
         .clipboard-banner.show {
             display: flex;
         }
 
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .clipboard-banner-buttons {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .clipboard-banner-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+            flex: 1;
+            overflow: hidden;
         }
 
         .clipboard-banner-text {
             font-size: 13px;
             color: var(--text-secondary);
+            flex-shrink: 0;
         }
 
         .clipboard-banner-preview {
             font-family: var(--font-mono);
             font-size: 12px;
             color: var(--text-muted);
-            max-width: 200px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -1035,10 +1037,14 @@
     </header>
 
     <div class="clipboard-banner" id="clipboardBanner">
-        <span class="clipboard-banner-text">JSON detected in clipboard:</span>
-        <span class="clipboard-banner-preview" id="clipboardPreview"></span>
-        <button class="btn btn-success" id="pasteClipboardBtn">Paste JSON</button>
-        <button class="btn" id="dismissClipboardBtn">Dismiss</button>
+        <div class="clipboard-banner-buttons">
+            <button class="btn btn-success" id="pasteClipboardBtn">Paste JSON</button>
+            <button class="btn" id="dismissClipboardBtn">Dismiss</button>
+        </div>
+        <div class="clipboard-banner-content">
+            <span class="clipboard-banner-text">JSON detected in clipboard:</span>
+            <span class="clipboard-banner-preview" id="clipboardPreview"></span>
+        </div>
     </div>
 
     <main class="main-container">
@@ -1192,8 +1198,7 @@
 
                 this.initElements();
                 this.initEventListeners();
-                // Only check clipboard once on initial load, with a slight delay
-                setTimeout(() => this.checkClipboard(), 500);
+                this.checkClipboard();
             }
 
             // Initialize DOM elements
@@ -1242,8 +1247,12 @@
             // Initialize event listeners
             initEventListeners() {
                 // Editor events
-                this.editor.addEventListener('input', () => this.handleEditorInput());
+                this.editor.addEventListener('input', () => {
+                    this.dismissClipboardBanner();
+                    this.handleEditorInput();
+                });
                 this.editor.addEventListener('paste', (e) => this.handlePaste(e));
+                this.editor.addEventListener('focus', () => this.dismissClipboardBanner());
 
                 // Toolbar buttons
                 document.getElementById('pasteBtn').addEventListener('click', () => this.pasteFromClipboard());
@@ -2099,7 +2108,7 @@
                     
                     if (result.success) {
                         this.clipboardJSON = text;
-                        this.clipboardPreview.textContent = text.substring(0, 50) + (text.length > 50 ? '...' : '');
+                        this.clipboardPreview.textContent = text.substring(0, 500);
                         this.clipboardBanner.classList.add('show');
                     }
                 } catch (e) {
