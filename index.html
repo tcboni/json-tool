@@ -1243,10 +1243,8 @@
         this.jsonData = null;
         this.isUpdating = false;
         this.clipboardJSON = null;
-        this.currentPath = "$";
         this.contextMenuTarget = null;
         this.clipboardChecked = false;
-        this.clipboardPermissionDenied = false;
         this.currentMode = "explorer";
 
         this.initElements();
@@ -1308,7 +1306,7 @@
           this.dismissClipboardBanner();
           this.handleEditorInput();
         });
-        this.editor.addEventListener("paste", (e) => this.handlePaste(e));
+        this.editor.addEventListener("paste", () => this.handlePaste());
         this.editor.addEventListener("focus", () =>
           this.dismissClipboardBanner()
         );
@@ -1730,7 +1728,7 @@
         }
       }
 
-      handlePaste(e) {
+      handlePaste() {
         // Let the default paste happen, then process
         setTimeout(() => this.handleEditorInput(), 0);
       }
@@ -1806,7 +1804,6 @@
             this.toggleNode(toggle);
             const currentPath = this.getPathFromElement(item);
             this.pathValue.textContent = currentPath;
-            this.currentPath = currentPath;
           });
         }
 
@@ -1829,7 +1826,6 @@
           keySpan.addEventListener("focus", () => {
             const currentPath = this.getPathFromElement(keySpan);
             this.pathValue.textContent = currentPath;
-            this.currentPath = currentPath;
           });
           item.appendChild(keySpan);
         } else if (key !== null) {
@@ -1896,7 +1892,7 @@
             textSpan.contentEditable = true;
             textSpan.dataset.type = type;
             textSpan.addEventListener("blur", (e) =>
-              this.handleBooleanEdit(e, path, checkbox)
+              this.handleBooleanEdit(e, checkbox)
             );
             textSpan.addEventListener("keydown", (e) => {
               if (e.key === "Enter") {
@@ -1907,7 +1903,6 @@
             textSpan.addEventListener("focus", () => {
               const currentPath = this.getPathFromElement(textSpan);
               this.pathValue.textContent = currentPath;
-              this.currentPath = currentPath;
             });
             valueSpan.appendChild(textSpan);
           } else {
@@ -1915,7 +1910,7 @@
             valueSpan.contentEditable = true;
             valueSpan.dataset.type = type;
             valueSpan.addEventListener("blur", (e) =>
-              this.handleValueEdit(e, path)
+              this.handleValueEdit(e)
             );
             valueSpan.addEventListener("keydown", (e) => {
               if (e.key === "Enter") {
@@ -1926,7 +1921,6 @@
             valueSpan.addEventListener("focus", () => {
               const currentPath = this.getPathFromElement(valueSpan);
               this.pathValue.textContent = currentPath;
-              this.currentPath = currentPath;
             });
           }
         }
@@ -1960,7 +1954,6 @@
           item.addEventListener("click", () => {
             const currentPath = this.getPathFromElement(item);
             this.pathValue.textContent = currentPath;
-            this.currentPath = currentPath;
           });
         }
 
@@ -2076,7 +2069,7 @@
       // Tree Editing
       // ============================================
 
-      handleValueEdit(e, path) {
+      handleValueEdit(e) {
         const span = e.target;
         let newValue = span.textContent;
         const oldType = span.dataset.type;
@@ -2179,7 +2172,7 @@
         this.renderTree();
       }
 
-      handleBooleanEdit(e, path, checkbox) {
+      handleBooleanEdit(e, checkbox) {
         const span = e.target;
         const newValue = span.textContent.trim();
 
@@ -2289,7 +2282,6 @@
               span;
             const newPath = this.getPathFromElement(valueElement);
             this.pathValue.textContent = newPath;
-            this.currentPath = newPath;
           }
 
           this.syncEditorFromTree();
