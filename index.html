@@ -2598,14 +2598,64 @@
             this.deleteAtPath(path);
             break;
           case "add-property":
-            this.showToast(
-              "Click on a value to edit, or modify the raw JSON",
-              "info"
-            );
+            this.addPropertyAtPath(path, data);
             break;
         }
 
         this.hideContextMenu();
+      }
+
+      addPropertyAtPath(path, data) {
+        const parts = this.parsePath(path);
+
+        // If data is an object or array, add inside it
+        if (typeof data === "object" && data !== null) {
+          if (Array.isArray(data)) {
+            data.push(null);
+          } else {
+            // Find a unique key name
+            let keyNum = 1;
+            let newKey = "newKey";
+            while (newKey in data) {
+              newKey = `newKey${keyNum++}`;
+            }
+            data[newKey] = null;
+          }
+        } else {
+          // Add as sibling - get parent and add next to current element
+          if (parts.length === 0) {
+            // Root level - can't add sibling
+            this.showToast("Cannot add sibling at root level", "info");
+            return;
+          }
+
+          const parentParts = parts.slice(0, -1);
+          const currentKey = parts[parts.length - 1];
+          const parent = parentParts.length
+            ? this.getValueAtPath(parentParts)
+            : this.jsonData;
+
+          if (Array.isArray(parent)) {
+            // Insert after current index
+            const insertIndex = parseInt(currentKey) + 1;
+            parent.splice(insertIndex, 0, null);
+          } else if (typeof parent === "object" && parent !== null) {
+            // Add new key to object
+            let keyNum = 1;
+            let newKey = "newKey";
+            while (newKey in parent) {
+              newKey = `newKey${keyNum++}`;
+            }
+            parent[newKey] = null;
+          } else {
+            this.showToast("Cannot add property here", "info");
+            return;
+          }
+        }
+
+        this.syncEditorFromTree();
+        this.renderTree();
+        this.showToast("Property added", "success");
       }
 
       deleteAtPath(path) {
