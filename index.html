@@ -1,1651 +1,1615 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>JSON Tool</title>
-    <link
-      rel="icon"
-      type="image/svg+xml"
-      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%2358a6ff'/><stop offset='100%25' stop-color='%23a371f7'/></linearGradient></defs><rect width='100' height='100' rx='20' fill='url(%23g)'/><text x='50' y='68' font-family='monospace' font-size='50' font-weight='bold' fill='white' text-anchor='middle'>{}</text></svg>"
-    />
-    <style>
-      :root {
-        --bg-primary: #0d1117;
-        --bg-secondary: #161b22;
-        --bg-tertiary: #21262d;
-        --bg-hover: #30363d;
-        --border-color: #30363d;
-        --text-primary: #e6edf3;
-        --text-secondary: #8b949e;
-        --text-muted: #6e7681;
-        --accent-blue: #58a6ff;
-        --accent-green: #3fb950;
-        --accent-orange: #d29922;
-        --accent-red: #f85149;
-        --accent-purple: #a371f7;
-        --accent-cyan: #39c5cf;
-        --string-color: #a5d6ff;
-        --number-color: #79c0ff;
-        --boolean-color: #ff7b72;
-        --null-color: #ffa657;
-        --key-color: #7ee787;
-        --font-mono: "SF Mono", "Cascadia Code", "Fira Code", "JetBrains Mono",
-          Consolas, monospace;
-        --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-          Arial, sans-serif;
-        --radius: 8px;
-        --radius-sm: 4px;
-        --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-        --transition: 0.2s ease;
-      }
 
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JSON Tool</title>
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%2358a6ff'/><stop offset='100%25' stop-color='%23a371f7'/></linearGradient></defs><rect width='100' height='100' rx='20' fill='url(%23g)'/><text x='50' y='68' font-family='monospace' font-size='50' font-weight='bold' fill='white' text-anchor='middle'>{}</text></svg>" />
+  <style>
+    :root {
+      --bg-primary: #0d1117;
+      --bg-secondary: #161b22;
+      --bg-tertiary: #21262d;
+      --bg-hover: #30363d;
+      --border-color: #30363d;
+      --text-primary: #e6edf3;
+      --text-secondary: #8b949e;
+      --text-muted: #6e7681;
+      --accent-blue: #58a6ff;
+      --accent-green: #3fb950;
+      --accent-orange: #d29922;
+      --accent-red: #f85149;
+      --accent-purple: #a371f7;
+      --accent-cyan: #39c5cf;
+      --string-color: #a5d6ff;
+      --number-color: #79c0ff;
+      --boolean-color: #ff7b72;
+      --null-color: #ffa657;
+      --key-color: #7ee787;
+      --font-mono: "SF Mono", "Cascadia Code", "Fira Code", "JetBrains Mono",
+        Consolas, monospace;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
+        Arial, sans-serif;
+      --radius: 8px;
+      --radius-sm: 4px;
+      --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      --transition: 0.2s ease;
+    }
 
-      html,
-      body {
-        height: 100%;
-      }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-      body {
-        font-family: var(--font-sans);
-        background: var(--bg-primary);
-        color: var(--text-primary);
-        display: flex;
-        flex-direction: column;
-      }
+    html,
+    body {
+      height: 100%;
+    }
 
-      /* Header */
-      .header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 12px 20px;
-        background: var(--bg-secondary);
-        border-bottom: 1px solid var(--border-color);
-        gap: 16px;
-      }
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      display: flex;
+      flex-direction: column;
+    }
 
-      .logo {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 18px;
-        font-weight: 600;
-        color: var(--text-primary);
-        flex: 1;
-        min-width: 0;
-      }
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      gap: 16px;
+    }
 
-      .logo-icon {
-        width: 32px;
-        height: 32px;
-        background: linear-gradient(
-          135deg,
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      flex: 1;
+      min-width: 0;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg,
           var(--accent-blue),
-          var(--accent-purple)
-        );
-        border-radius: var(--radius-sm);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 14px;
-        font-weight: 700;
+          var(--accent-purple));
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .mode-tabs {
+      display: flex;
+      background: var(--bg-primary);
+      border-radius: var(--radius);
+      padding: 4px;
+      gap: 4px;
+    }
+
+    .mode-tab {
+      padding: 8px 20px;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: var(--font-sans);
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .mode-tab:hover {
+      color: var(--text-primary);
+      background: var(--bg-hover);
+    }
+
+    .mode-tab.active {
+      color: var(--text-primary);
+      background: var(--bg-tertiary);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: var(--font-sans);
+      color: var(--text-primary);
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all var(--transition);
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      background: var(--bg-hover);
+      border-color: var(--text-muted);
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: var(--accent-blue);
+      border-color: var(--accent-blue);
+      color: var(--bg-primary);
+    }
+
+    .btn-primary:hover {
+      background: #79b8ff;
+      border-color: #79b8ff;
+    }
+
+    .btn-success {
+      background: var(--accent-green);
+      border-color: var(--accent-green);
+      color: var(--bg-primary);
+    }
+
+    .btn-success:hover {
+      background: #56d364;
+      border-color: #56d364;
+    }
+
+    .btn-icon {
+      padding: 8px;
+      min-width: 36px;
+      justify-content: center;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      flex: 1;
+      min-width: 0;
+    }
+
+    .github-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      transition: all var(--transition);
+      margin-left: 8px;
+    }
+
+    .github-link:hover {
+      color: var(--text-primary);
+      background: var(--bg-hover);
+    }
+
+    .github-icon {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-muted);
+    }
+
+    .status-dot.valid {
+      background: var(--accent-green);
+      box-shadow: 0 0 8px var(--accent-green);
+    }
+
+    .status-dot.invalid {
+      background: var(--accent-red);
+      box-shadow: 0 0 8px var(--accent-red);
+    }
+
+    /* Main Container */
+    .main-container {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+    }
+
+    /* Panels */
+    .panel {
+      display: flex;
+      flex-direction: column;
+      min-width: 300px;
+      background: var(--bg-secondary);
+    }
+
+    .panel-left {
+      flex: 1;
+      border-right: 1px solid var(--border-color);
+    }
+
+    .panel-right {
+      flex: 1;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: var(--bg-tertiary);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .panel-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .panel-actions {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .panel-btn {
+      padding: 4px 8px;
+      font-size: 11px;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      transition: all var(--transition);
+      white-space: nowrap;
+    }
+
+    .panel-btn:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    /* Diff Mode Styles */
+    .diff-inputs {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .diff-input-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .diff-input-section:last-child {
+      border-bottom: none;
+    }
+
+    .diff-input-header {
+      padding: 8px 16px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .diff-editor {
+      flex: 1;
+      min-height: 0;
+    }
+
+    .diff-container {
+      padding: 16px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+    }
+
+    .diff-stats {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .diff-line {
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      margin: 2px 0;
+      display: flex;
+      gap: 12px;
+    }
+
+    .diff-line.added {
+      background: rgba(63, 185, 80, 0.15);
+      color: var(--accent-green);
+    }
+
+    .diff-line.removed {
+      background: rgba(248, 81, 73, 0.15);
+      color: var(--accent-red);
+    }
+
+    .diff-line.changed {
+      background: rgba(210, 153, 34, 0.15);
+      color: var(--accent-orange);
+    }
+
+    .diff-line.unchanged {
+      color: var(--text-muted);
+    }
+
+    .diff-path {
+      color: var(--text-secondary);
+      min-width: 200px;
+    }
+
+    .diff-prefix {
+      font-weight: 700;
+      width: 16px;
+      flex-shrink: 0;
+    }
+
+    .diff-value {
+      flex: 1;
+      word-break: break-all;
+    }
+
+    .diff-section {
+      margin-bottom: 16px;
+    }
+
+    .diff-section-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .panel-content {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .panel-content.scrollable {
+      overflow: auto;
+    }
+
+    /* Editor */
+    .editor-wrapper {
+      height: 100%;
+      position: relative;
+    }
+
+    .editor {
+      width: 100%;
+      height: 100%;
+      padding: 16px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text-primary);
+      background: transparent;
+      border: none;
+      resize: none;
+      outline: none;
+      tab-size: 2;
+      overflow: auto;
+    }
+
+    .editor::placeholder {
+      color: var(--text-muted);
+    }
+
+    /* Tree View */
+    .tree-container {
+      padding: 16px;
+    }
+
+    .tree-node {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .tree-item {
+      display: flex;
+      align-items: center;
+      padding: 2px 0;
+      padding-left: 20px;
+      position: relative;
+      cursor: default;
+    }
+
+    .tree-item:hover {
+      background: var(--bg-hover);
+      border-radius: var(--radius-sm);
+    }
+
+    .tree-toggle {
+      position: absolute;
+      left: 2px;
+      top: 4px;
+      width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-family: var(--font-mono);
+      border-radius: 2px;
+      transition: all var(--transition);
+    }
+
+    .tree-toggle:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    .tree-toggle.collapsed::before {
+      content: "+";
+      font-weight: 700;
+    }
+
+    .tree-toggle.expanded::before {
+      content: "−";
+      font-weight: 700;
+    }
+
+    .tree-key {
+      color: var(--key-color);
+      margin-right: 4px;
+    }
+
+    .tree-key::after {
+      content: ":";
+      color: var(--text-muted);
+      margin-right: 8px;
+    }
+
+    .tree-value {
+      flex: 1;
+    }
+
+    .tree-value.string {
+      color: var(--string-color);
+    }
+
+    .tree-value.string.editing {
+      color: var(--string-color);
+    }
+
+    .tree-value.number {
+      color: var(--number-color);
+    }
+
+    .tree-value.boolean {
+      color: var(--boolean-color);
+    }
+
+    .tree-value.null {
+      color: var(--null-color);
+      font-style: italic;
+    }
+
+    .tree-value.null[contenteditable="true"]:empty::before {
+      content: "null";
+      opacity: 0.5;
+    }
+
+    .bool-checkbox {
+      width: 14px;
+      height: 14px;
+      margin-right: 6px;
+      cursor: pointer;
+      accent-color: var(--accent-blue);
+      vertical-align: middle;
+    }
+
+    .bool-label {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .tree-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: 8px;
+      opacity: 0;
+      transition: opacity var(--transition);
+      vertical-align: middle;
+    }
+
+    .tree-item:hover>.tree-value .tree-actions,
+    .tree-item:hover>.tree-item-actions {
+      opacity: 1;
+    }
+
+    .tree-action-btn {
+      padding: 2px 6px;
+      font-size: 18px;
+      line-height: 1;
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .tree-action-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--text-muted);
+    }
+
+    .tree-action-btn.add:hover {
+      color: var(--accent-green);
+      border-color: var(--accent-green);
+    }
+
+    .tree-action-btn.delete:hover {
+      color: var(--accent-red);
+      border-color: var(--accent-red);
+    }
+
+    .tree-item-actions {
+      margin-right: 8px;
+    }
+
+    .tree-bracket {
+      color: var(--text-muted);
+    }
+
+    .tree-children {
+      margin-left: 16px;
+      border-left: 1px solid var(--border-color);
+    }
+
+    .tree-children.collapsed {
+      display: none;
+    }
+
+    .tree-summary {
+      color: var(--text-muted);
+      font-size: 12px;
+      margin-left: 4px;
+    }
+
+    .tree-index {
+      color: var(--text-muted);
+      margin-right: 4px;
+      font-size: 11px;
+    }
+
+    /* Editable values */
+    .tree-value[contenteditable="true"] {
+      outline: none;
+      padding: 0 4px;
+      margin: 0 -4px;
+      border-radius: 2px;
+      min-width: 20px;
+    }
+
+    .tree-value[contenteditable="true"]:focus {
+      background: var(--bg-primary);
+      box-shadow: 0 0 0 2px var(--accent-blue);
+    }
+
+    /* Resizer */
+    .resizer {
+      width: 4px;
+      background: var(--border-color);
+      cursor: col-resize;
+      transition: background var(--transition);
+      flex-shrink: 0;
+    }
+
+    .resizer:hover,
+    .resizer.active {
+      background: var(--accent-blue);
+    }
+
+    /* Search Bar */
+    .search-container {
+      padding: 8px 16px;
+      background: var(--bg-tertiary);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-family: var(--font-sans);
+      color: var(--text-primary);
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      outline: none;
+      transition: all var(--transition);
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    /* Clipboard Banner */
+    .clipboard-banner {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 20px;
+      background: linear-gradient(135deg,
+          rgba(88, 166, 255, 0.1),
+          rgba(163, 113, 247, 0.1));
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .clipboard-banner.show {
+      display: flex;
+    }
+
+    .clipboard-banner-buttons {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .clipboard-banner-content {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .clipboard-banner-text {
+      font-size: 13px;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+
+    .clipboard-banner-preview {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Toast Notifications */
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .toast {
+      padding: 12px 20px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      font-size: 13px;
+      color: var(--text-primary);
+      animation: toastIn 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toast.success {
+      border-left: 3px solid var(--accent-green);
+    }
+
+    .toast.error {
+      border-left: 3px solid var(--accent-red);
+    }
+
+    .toast.info {
+      border-left: 3px solid var(--accent-blue);
+    }
+
+    @keyframes toastIn {
+      from {
+        opacity: 0;
+        transform: translateX(20px);
       }
 
-      .mode-tabs {
-        display: flex;
-        background: var(--bg-primary);
-        border-radius: var(--radius);
-        padding: 4px;
-        gap: 4px;
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* Error Display */
+    .error-display {
+      padding: 16px;
+      color: var(--accent-red);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      white-space: pre-wrap;
+    }
+
+    /* Empty State */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      padding: 40px;
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .empty-state-text {
+      font-size: 14px;
+      max-width: 280px;
+      line-height: 1.6;
+    }
+
+    /* Path Display */
+    .path-display {
+      padding: 8px 16px;
+      background: var(--bg-primary);
+      border-top: 1px solid var(--border-color);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-secondary);
+      align-items: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .path-display-label {
+      color: var(--text-muted);
+      margin-right: 8px;
+    }
+
+    .path-display-value {
+      color: var(--accent-cyan);
+    }
+
+    /* Stats Bar */
+    .stats-bar {
+      display: flex;
+      gap: 16px;
+      padding: 8px 16px;
+      background: var(--bg-primary);
+      border-top: 1px solid var(--border-color);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .stat-value {
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
       }
 
-      .mode-tab {
-        padding: 8px 20px;
-        font-size: 13px;
-        font-weight: 500;
-        font-family: var(--font-sans);
-        color: var(--text-secondary);
-        background: transparent;
-        border: none;
-        border-radius: var(--radius-sm);
-        cursor: pointer;
-        transition: all var(--transition);
+      to {
+        opacity: 1;
+      }
+    }
+
+    .modal {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      max-width: 500px;
+      width: 90%;
+      animation: modalIn 0.3s ease;
+    }
+
+    @keyframes modalIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-10px);
       }
 
-      .mode-tab:hover {
-        color: var(--text-primary);
-        background: var(--bg-hover);
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
       }
+    }
 
-      .mode-tab.active {
-        color: var(--text-primary);
-        background: var(--bg-tertiary);
-      }
+    .modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
-      .btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 8px 14px;
-        font-size: 13px;
-        font-weight: 500;
-        font-family: var(--font-sans);
-        color: var(--text-primary);
-        background: var(--bg-tertiary);
-        border: 1px solid var(--border-color);
-        border-radius: var(--radius);
-        cursor: pointer;
-        transition: all var(--transition);
-        white-space: nowrap;
-      }
+    .modal-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
 
-      .btn:hover {
-        background: var(--bg-hover);
-        border-color: var(--text-muted);
-      }
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 18px;
+      padding: 4px;
+      line-height: 1;
+    }
 
-      .btn:active {
-        transform: scale(0.98);
-      }
+    .modal-close:hover {
+      color: var(--text-primary);
+    }
 
-      .btn-primary {
-        background: var(--accent-blue);
-        border-color: var(--accent-blue);
-        color: var(--bg-primary);
-      }
+    .modal-body {
+      padding: 20px;
+    }
 
-      .btn-primary:hover {
-        background: #79b8ff;
-        border-color: #79b8ff;
-      }
+    .modal-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
 
-      .btn-success {
-        background: var(--accent-green);
-        border-color: var(--accent-green);
-        color: var(--bg-primary);
-      }
+    /* Type Badge */
+    .type-badge {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 8px;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
 
-      .btn-success:hover {
-        background: #56d364;
-        border-color: #56d364;
-      }
+    .type-badge.object {
+      background: rgba(163, 113, 247, 0.2);
+      color: var(--accent-purple);
+    }
 
-      .btn-icon {
-        padding: 8px;
-        min-width: 36px;
-        justify-content: center;
-      }
+    .type-badge.array {
+      background: rgba(57, 197, 207, 0.2);
+      color: var(--accent-cyan);
+    }
 
-      .status {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 8px;
-        font-size: 13px;
-        color: var(--text-secondary);
-        flex: 1;
-        min-width: 0;
-      }
+    /* Keyboard Shortcuts */
+    kbd {
+      display: inline-block;
+      padding: 2px 6px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--text-secondary);
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+    }
 
-      .github-link {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 32px;
-        height: 32px;
-        color: var(--text-secondary);
-        text-decoration: none;
-        border-radius: var(--radius-sm);
-        transition: all var(--transition);
-        margin-left: 8px;
-      }
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
 
-      .github-link:hover {
-        color: var(--text-primary);
-        background: var(--bg-hover);
-      }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
 
-      .github-icon {
-        width: 20px;
-        height: 20px;
-        fill: currentColor;
-      }
+    ::-webkit-scrollbar-thumb {
+      background: var(--bg-hover);
+      border-radius: 4px;
+    }
 
-      .status-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: var(--text-muted);
-      }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-muted);
+    }
 
-      .status-dot.valid {
-        background: var(--accent-green);
-        box-shadow: 0 0 8px var(--accent-green);
-      }
+    /* Highlight */
+    .highlight {
+      background: rgba(210, 153, 34, 0.3);
+      border-radius: 2px;
+    }
 
-      .status-dot.invalid {
-        background: var(--accent-red);
-        box-shadow: 0 0 8px var(--accent-red);
-      }
+    /* Context Menu */
+    .context-menu {
+      position: fixed;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      min-width: 180px;
+      z-index: 1000;
+      padding: 4px 0;
+      display: none;
+    }
 
-      /* Main Container */
-      .main-container {
-        display: flex;
-        flex: 1;
-        min-height: 0;
-      }
+    .context-menu.show {
+      display: block;
+    }
 
-      /* Panels */
-      .panel {
-        display: flex;
+    .context-menu-item {
+      padding: 8px 12px;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-primary);
+    }
+
+    .context-menu-item:hover {
+      background: var(--bg-hover);
+    }
+
+    .context-menu-separator {
+      height: 1px;
+      background: var(--border-color);
+      margin: 4px 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header {
         flex-direction: column;
-        min-width: 300px;
-        background: var(--bg-secondary);
+        padding: 12px;
+      }
+
+      .toolbar {
+        justify-content: center;
+      }
+
+      .main-container {
+        flex-direction: column;
+      }
+
+      .panel {
+        min-width: 0;
+        min-height: 200px;
       }
 
       .panel-left {
-        flex: 1;
-        border-right: 1px solid var(--border-color);
-      }
-
-      .panel-right {
-        flex: 1;
-      }
-
-      .panel-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 12px 16px;
-        background: var(--bg-tertiary);
+        border-right: none;
         border-bottom: 1px solid var(--border-color);
       }
 
-      .panel-title {
-        font-size: 13px;
-        font-weight: 600;
-        color: var(--text-secondary);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-
-      .panel-actions {
-        display: flex;
-        gap: 4px;
-        flex-wrap: wrap;
-      }
-
-      .panel-btn {
-        padding: 4px 8px;
-        font-size: 11px;
-        background: transparent;
-        border: none;
-        color: var(--text-secondary);
-        cursor: pointer;
-        border-radius: var(--radius-sm);
-        transition: all var(--transition);
-        white-space: nowrap;
-      }
-
-      .panel-btn:hover {
-        background: var(--bg-hover);
-        color: var(--text-primary);
-      }
-
-      /* Diff Mode Styles */
-      .diff-inputs {
-        display: flex;
-        flex-direction: column;
-        flex: 1;
-        overflow: hidden;
-      }
-
-      .diff-input-section {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        min-height: 0;
-        border-bottom: 1px solid var(--border-color);
-      }
-
-      .diff-input-section:last-child {
-        border-bottom: none;
-      }
-
-      .diff-input-header {
-        padding: 8px 16px;
-        font-size: 11px;
-        font-weight: 600;
-        color: var(--text-muted);
-        background: var(--bg-tertiary);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-
-      .diff-editor {
-        flex: 1;
-        min-height: 0;
-      }
-
-      .diff-container {
-        padding: 16px;
-        font-family: var(--font-mono);
-        font-size: 13px;
-      }
-
-      .diff-stats {
-        font-size: 12px;
-        color: var(--text-muted);
-      }
-
-      .diff-line {
-        padding: 2px 8px;
-        border-radius: var(--radius-sm);
-        margin: 2px 0;
-        display: flex;
-        gap: 12px;
-      }
-
-      .diff-line.added {
-        background: rgba(63, 185, 80, 0.15);
-        color: var(--accent-green);
-      }
-
-      .diff-line.removed {
-        background: rgba(248, 81, 73, 0.15);
-        color: var(--accent-red);
-      }
-
-      .diff-line.changed {
-        background: rgba(210, 153, 34, 0.15);
-        color: var(--accent-orange);
-      }
-
-      .diff-line.unchanged {
-        color: var(--text-muted);
-      }
-
-      .diff-path {
-        color: var(--text-secondary);
-        min-width: 200px;
-      }
-
-      .diff-prefix {
-        font-weight: 700;
-        width: 16px;
-        flex-shrink: 0;
-      }
-
-      .diff-value {
-        flex: 1;
-        word-break: break-all;
-      }
-
-      .diff-section {
-        margin-bottom: 16px;
-      }
-
-      .diff-section-title {
-        font-size: 12px;
-        font-weight: 600;
-        color: var(--text-secondary);
-        margin-bottom: 8px;
-        padding-bottom: 8px;
-        border-bottom: 1px solid var(--border-color);
-      }
-
-      .panel-content {
-        flex: 1;
-        overflow: hidden;
-        position: relative;
-      }
-
-      .panel-content.scrollable {
-        overflow: auto;
-      }
-
-      /* Editor */
-      .editor-wrapper {
-        height: 100%;
-        position: relative;
-      }
-
-      .editor {
-        width: 100%;
-        height: 100%;
-        padding: 16px;
-        font-family: var(--font-mono);
-        font-size: 13px;
-        line-height: 1.6;
-        color: var(--text-primary);
-        background: transparent;
-        border: none;
-        resize: none;
-        outline: none;
-        tab-size: 2;
-        overflow: auto;
-      }
-
-      .editor::placeholder {
-        color: var(--text-muted);
-      }
-
-      /* Tree View */
-      .tree-container {
-        padding: 16px;
-      }
-
-      .tree-node {
-        font-family: var(--font-mono);
-        font-size: 13px;
-        line-height: 1.8;
-      }
-
-      .tree-item {
-        display: flex;
-        align-items: center;
-        padding: 2px 0;
-        padding-left: 20px;
-        position: relative;
-        cursor: default;
-      }
-
-      .tree-item:hover {
-        background: var(--bg-hover);
-        border-radius: var(--radius-sm);
-      }
-
-      .tree-toggle {
-        position: absolute;
-        left: 2px;
-        top: 4px;
-        width: 16px;
-        height: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        color: var(--text-muted);
-        font-size: 12px;
-        font-family: var(--font-mono);
-        border-radius: 2px;
-        transition: all var(--transition);
-      }
-
-      .tree-toggle:hover {
-        background: var(--bg-hover);
-        color: var(--text-primary);
-      }
-
-      .tree-toggle.collapsed::before {
-        content: "+";
-        font-weight: 700;
-      }
-
-      .tree-toggle.expanded::before {
-        content: "−";
-        font-weight: 700;
-      }
-
-      .tree-key {
-        color: var(--key-color);
-        margin-right: 4px;
-      }
-
-      .tree-key::after {
-        content: ":";
-        color: var(--text-muted);
-        margin-right: 8px;
-      }
-
-      .tree-value {
-        flex: 1;
-      }
-
-      .tree-value.string {
-        color: var(--string-color);
-      }
-
-      .tree-value.string.editing {
-        color: var(--string-color);
-      }
-
-      .tree-value.number {
-        color: var(--number-color);
-      }
-
-      .tree-value.boolean {
-        color: var(--boolean-color);
-      }
-
-      .tree-value.null {
-        color: var(--null-color);
-        font-style: italic;
-      }
-
-      .tree-value.null[contenteditable="true"]:empty::before {
-        content: "null";
-        opacity: 0.5;
-      }
-
-      .bool-checkbox {
-        width: 14px;
-        height: 14px;
-        margin-right: 6px;
-        cursor: pointer;
-        accent-color: var(--accent-blue);
-        vertical-align: middle;
-      }
-
-      .bool-label {
-        cursor: pointer;
-        user-select: none;
-      }
-
-      .tree-actions {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        margin-left: 8px;
-        opacity: 0;
-        transition: opacity var(--transition);
-        vertical-align: middle;
-      }
-
-      .tree-item:hover > .tree-value .tree-actions,
-      .tree-item:hover > .tree-item-actions {
-        opacity: 1;
-      }
-
-      .tree-action-btn {
-        padding: 2px 6px;
-        font-size: 10px;
-        color: var(--text-muted);
-        background: var(--bg-tertiary);
-        border: 1px solid var(--border-color);
-        border-radius: 3px;
-        cursor: pointer;
-        transition: all var(--transition);
-      }
-
-      .tree-action-btn:hover {
-        color: var(--text-primary);
-        border-color: var(--text-muted);
-      }
-
-      .tree-action-btn.add:hover {
-        color: var(--accent-green);
-        border-color: var(--accent-green);
-      }
-
-      .tree-action-btn.delete:hover {
-        color: var(--accent-red);
-        border-color: var(--accent-red);
-      }
-
-      .tree-item-actions {
-        margin-right: 8px;
-      }
-
-      .tree-bracket {
-        color: var(--text-muted);
-      }
-
-      .tree-children {
-        margin-left: 16px;
-        border-left: 1px solid var(--border-color);
-      }
-
-      .tree-children.collapsed {
-        display: none;
-      }
-
-      .tree-summary {
-        color: var(--text-muted);
-        font-size: 12px;
-        margin-left: 4px;
-      }
-
-      .tree-index {
-        color: var(--text-muted);
-        margin-right: 4px;
-        font-size: 11px;
-      }
-
-      /* Editable values */
-      .tree-value[contenteditable="true"] {
-        outline: none;
-        padding: 0 4px;
-        margin: 0 -4px;
-        border-radius: 2px;
-        min-width: 20px;
-      }
-
-      .tree-value[contenteditable="true"]:focus {
-        background: var(--bg-primary);
-        box-shadow: 0 0 0 2px var(--accent-blue);
-      }
-
-      /* Resizer */
       .resizer {
-        width: 4px;
-        background: var(--border-color);
-        cursor: col-resize;
-        transition: background var(--transition);
-        flex-shrink: 0;
-      }
-
-      .resizer:hover,
-      .resizer.active {
-        background: var(--accent-blue);
-      }
-
-      /* Search Bar */
-      .search-container {
-        padding: 8px 16px;
-        background: var(--bg-tertiary);
-        border-bottom: 1px solid var(--border-color);
-      }
-
-      .search-input {
         width: 100%;
-        padding: 8px 12px;
-        font-size: 13px;
-        font-family: var(--font-sans);
-        color: var(--text-primary);
-        background: var(--bg-primary);
-        border: 1px solid var(--border-color);
-        border-radius: var(--radius);
-        outline: none;
-        transition: all var(--transition);
+        height: 4px;
+        cursor: row-resize;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">{}</div>
+      <span>JSON Tool</span>
+    </div>
+
+    <div class="mode-tabs">
+      <button class="mode-tab active" data-mode="explorer">Explorer</button>
+      <button class="mode-tab" data-mode="diff">Diff Viewer</button>
+    </div>
+
+    <div class="status">
+      <span class="status-dot" id="statusDot"></span>
+      <span id="statusText">Ready</span>
+    </div>
+
+    <a href="https://github.com/tcboni/json-tool" target="_blank" rel="noopener noreferrer" class="github-link"
+      title="View on GitHub">
+      <svg class="github-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z" />
+      </svg>
+    </a>
+  </header>
+
+  <div class="clipboard-banner" id="clipboardBanner">
+    <div class="clipboard-banner-buttons">
+      <button class="btn btn-success" id="pasteClipboardBtn">
+        Paste JSON
+      </button>
+      <button class="btn" id="dismissClipboardBtn">Dismiss</button>
+    </div>
+    <div class="clipboard-banner-content">
+      <span class="clipboard-banner-text">JSON detected in clipboard:</span>
+      <span class="clipboard-banner-preview" id="clipboardPreview"></span>
+    </div>
+  </div>
+
+  <main class="main-container">
+    <section class="panel panel-left" id="panelLeft">
+      <div class="panel-header">
+        <span class="panel-title" id="leftPanelTitle">Raw JSON</span>
+        <div class="panel-actions" id="explorerActions">
+          <button class="panel-btn" id="pasteBtn" title="Paste">
+            📋 Paste
+          </button>
+          <button class="panel-btn" id="formatBtn" title="Format">
+            ✨ Format
+          </button>
+          <button class="panel-btn" id="minifyBtn" title="Minify">
+            📦 Minify
+          </button>
+          <button class="panel-btn" id="copyBtn" title="Copy">📄 Copy</button>
+          <button class="panel-btn" id="downloadBtn" title="Download">
+            💾 Download
+          </button>
+          <button class="panel-btn" id="clearBtn" title="Clear">
+            🗑️ Clear
+          </button>
+          <button class="panel-btn" id="sampleBtn" title="Sample">
+            📝 Sample
+          </button>
+        </div>
+        <div class="panel-actions" id="diffActions" style="display: none">
+          <button class="panel-btn" id="swapBtn" title="Swap">⇄ Swap</button>
+          <button class="panel-btn" id="clearDiffBtn" title="Clear">
+            🗑️ Clear
+          </button>
+        </div>
+      </div>
+
+      <!-- Explorer Mode Content -->
+      <div class="panel-content" id="explorerContent">
+        <div class="editor-wrapper">
+          <textarea class="editor" id="jsonEditor"
+            placeholder="Paste or type your JSON here...&#10;&#10;Tips:&#10;• Press Ctrl+V to paste&#10;• Press Ctrl+Shift+F to format&#10;• The tool auto-fixes common JSON issues"
+            spellcheck="false"></textarea>
+        </div>
+      </div>
+
+      <!-- Diff Mode Content -->
+      <div class="diff-inputs" id="diffContent" style="display: none">
+        <div class="diff-input-section">
+          <div class="diff-input-header">Original JSON</div>
+          <textarea class="editor diff-editor" id="diffEditorLeft" placeholder="Paste original JSON here..."
+            spellcheck="false"></textarea>
+        </div>
+        <div class="diff-input-section">
+          <div class="diff-input-header">Modified JSON</div>
+          <textarea class="editor diff-editor" id="diffEditorRight" placeholder="Paste modified JSON here..."
+            spellcheck="false"></textarea>
+        </div>
+      </div>
+
+      <div class="stats-bar" id="statsBar">
+        <div class="stat-item">
+          <span>Size:</span>
+          <span class="stat-value" id="sizeValue">0 B</span>
+        </div>
+        <div class="stat-item">
+          <span>Lines:</span>
+          <span class="stat-value" id="linesValue">0</span>
+        </div>
+        <div class="stat-item">
+          <span>Depth:</span>
+          <span class="stat-value" id="depthValue">0</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="resizer" id="resizer"></div>
+
+    <section class="panel panel-right" id="panelRight">
+      <!-- Explorer Mode Header -->
+      <div class="panel-header" id="explorerRightHeader">
+        <span class="panel-title">Tree View</span>
+        <div class="panel-actions">
+          <button class="panel-btn" id="expandAllBtn">Expand All</button>
+          <button class="panel-btn" id="collapseAllBtn">Collapse All</button>
+        </div>
+      </div>
+      <div class="search-container" id="searchContainer">
+        <input type="text" class="search-input" id="searchInput" placeholder="Search keys or values... (Ctrl+F)" />
+      </div>
+      <div class="panel-content scrollable" id="explorerRightContent">
+        <div class="tree-container" id="treeContainer">
+          <div class="empty-state" id="emptyState">
+            <div class="empty-state-icon">{ }</div>
+            <div class="empty-state-text">
+              Paste or type JSON in the left panel to see the interactive tree
+              view here
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="path-display" id="pathDisplay">
+        <span class="path-display-label">Path:</span>
+        <span class="path-display-value" id="pathValue">$</span>
+      </div>
+
+      <!-- Diff Mode Header -->
+      <div class="panel-header" id="diffRightHeader" style="display: none">
+        <span class="panel-title">Differences</span>
+        <div class="panel-actions">
+          <span class="diff-stats" id="diffStats"></span>
+        </div>
+      </div>
+      <div class="panel-content scrollable" id="diffRightContent" style="display: none">
+        <div class="diff-container" id="diffContainer">
+          <div class="empty-state" id="diffEmptyState">
+            <div class="empty-state-icon">⇄</div>
+            <div class="empty-state-text">
+              Paste JSON in both panels to see the differences
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <div class="context-menu" id="contextMenu">
+    <div class="context-menu-item" data-action="copy-value">
+      📋 Copy Value
+    </div>
+    <div class="context-menu-item" data-action="copy-path">🔗 Copy Path</div>
+    <div class="context-menu-separator"></div>
+    <div class="context-menu-item" data-action="add-property">
+      ➕ Add Property
+    </div>
+    <div class="context-menu-item" data-action="delete">🗑️ Delete</div>
+  </div>
+
+  <script>
+    // ============================================
+    // JSON Tool - Core Application
+    // ============================================
+
+    class JSONTool {
+      constructor() {
+        this.jsonData = null;
+        this.isUpdating = false;
+        this.clipboardJSON = null;
+        this.currentPath = "$";
+        this.contextMenuTarget = null;
+        this.clipboardChecked = false;
+        this.clipboardPermissionDenied = false;
+        this.currentMode = "explorer";
+
+        this.initElements();
+        this.initEventListeners();
+        this.checkClipboard();
       }
 
-      .search-input:focus {
-        border-color: var(--accent-blue);
-        box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
-      }
+      // Initialize DOM elements
+      initElements() {
+        this.editor = document.getElementById("jsonEditor");
+        this.treeContainer = document.getElementById("treeContainer");
+        this.emptyState = document.getElementById("emptyState");
+        this.statusDot = document.getElementById("statusDot");
+        this.statusText = document.getElementById("statusText");
+        this.clipboardBanner = document.getElementById("clipboardBanner");
+        this.clipboardPreview = document.getElementById("clipboardPreview");
+        this.searchInput = document.getElementById("searchInput");
+        this.pathValue = document.getElementById("pathValue");
+        this.toastContainer = document.getElementById("toastContainer");
+        this.contextMenu = document.getElementById("contextMenu");
+        this.resizer = document.getElementById("resizer");
 
-      .search-input::placeholder {
-        color: var(--text-muted);
-      }
+        // Stats
+        this.sizeValue = document.getElementById("sizeValue");
+        this.linesValue = document.getElementById("linesValue");
+        this.depthValue = document.getElementById("depthValue");
 
-      /* Clipboard Banner */
-      .clipboard-banner {
-        display: none;
-        align-items: center;
-        gap: 12px;
-        padding: 10px 20px;
-        background: linear-gradient(
-          135deg,
-          rgba(88, 166, 255, 0.1),
-          rgba(163, 113, 247, 0.1)
+        // Mode elements
+        this.modeTabs = document.querySelectorAll(".mode-tab");
+        this.explorerContent = document.getElementById("explorerContent");
+        this.diffContent = document.getElementById("diffContent");
+        this.explorerActions = document.getElementById("explorerActions");
+        this.diffActions = document.getElementById("diffActions");
+        this.explorerRightHeader = document.getElementById(
+          "explorerRightHeader"
         );
-        border-bottom: 1px solid var(--border-color);
+        this.explorerRightContent = document.getElementById(
+          "explorerRightContent"
+        );
+        this.diffRightHeader = document.getElementById("diffRightHeader");
+        this.diffRightContent = document.getElementById("diffRightContent");
+        this.searchContainer = document.getElementById("searchContainer");
+        this.pathDisplay = document.getElementById("pathDisplay");
+        this.statsBar = document.getElementById("statsBar");
+        this.leftPanelTitle = document.getElementById("leftPanelTitle");
+
+        // Diff elements
+        this.diffEditorLeft = document.getElementById("diffEditorLeft");
+        this.diffEditorRight = document.getElementById("diffEditorRight");
+        this.diffContainer = document.getElementById("diffContainer");
+        this.diffEmptyState = document.getElementById("diffEmptyState");
+        this.diffStats = document.getElementById("diffStats");
       }
 
-      .clipboard-banner.show {
-        display: flex;
+      // Initialize event listeners
+      initEventListeners() {
+        // Editor events
+        this.editor.addEventListener("input", () => {
+          this.dismissClipboardBanner();
+          this.handleEditorInput();
+        });
+        this.editor.addEventListener("paste", (e) => this.handlePaste(e));
+        this.editor.addEventListener("focus", () =>
+          this.dismissClipboardBanner()
+        );
+
+        // Toolbar buttons
+        document
+          .getElementById("pasteBtn")
+          .addEventListener("click", () => this.pasteFromClipboard());
+        document
+          .getElementById("formatBtn")
+          .addEventListener("click", () => this.formatJSON());
+        document
+          .getElementById("minifyBtn")
+          .addEventListener("click", () => this.minifyJSON());
+        document
+          .getElementById("copyBtn")
+          .addEventListener("click", () => this.copyToClipboard());
+        document
+          .getElementById("downloadBtn")
+          .addEventListener("click", () => this.downloadJSON());
+        document
+          .getElementById("clearBtn")
+          .addEventListener("click", () => this.clearAll());
+        document
+          .getElementById("sampleBtn")
+          .addEventListener("click", () => this.loadSample());
+
+        // Panel buttons
+        document
+          .getElementById("expandAllBtn")
+          .addEventListener("click", () => this.expandAll());
+        document
+          .getElementById("collapseAllBtn")
+          .addEventListener("click", () => this.collapseAll());
+
+        // Diff buttons
+        document
+          .getElementById("swapBtn")
+          .addEventListener("click", () => this.swapDiffInputs());
+        document
+          .getElementById("clearDiffBtn")
+          .addEventListener("click", () => this.clearDiff());
+
+        // Mode tabs
+        this.modeTabs.forEach((tab) => {
+          tab.addEventListener("click", () =>
+            this.switchMode(tab.dataset.mode)
+          );
+        });
+
+        // Diff editors
+        this.diffEditorLeft.addEventListener("input", () =>
+          this.handleDiffInput()
+        );
+        this.diffEditorRight.addEventListener("input", () =>
+          this.handleDiffInput()
+        );
+
+        // Clipboard banner
+        document
+          .getElementById("pasteClipboardBtn")
+          .addEventListener("click", () => this.pasteDetectedJSON());
+        document
+          .getElementById("dismissClipboardBtn")
+          .addEventListener("click", () => this.dismissClipboardBanner());
+
+        // Search
+        this.searchInput.addEventListener("input", () => this.handleSearch());
+
+        // Keyboard shortcuts
+        document.addEventListener("keydown", (e) => this.handleKeydown(e));
+
+        // Resizer
+        this.initResizer();
+
+        // Context menu
+        document.addEventListener("click", () => this.hideContextMenu());
+        this.contextMenu.addEventListener("click", (e) =>
+          this.handleContextMenuClick(e)
+        );
       }
 
-      .clipboard-banner-buttons {
-        display: flex;
-        gap: 8px;
-        flex-shrink: 0;
-      }
-
-      .clipboard-banner-content {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        min-width: 0;
-        flex: 1;
-        overflow: hidden;
-      }
-
-      .clipboard-banner-text {
-        font-size: 13px;
-        color: var(--text-secondary);
-        flex-shrink: 0;
-      }
-
-      .clipboard-banner-preview {
-        font-family: var(--font-mono);
-        font-size: 12px;
-        color: var(--text-muted);
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-
-      /* Toast Notifications */
-      .toast-container {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        z-index: 1000;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
-
-      .toast {
-        padding: 12px 20px;
-        background: var(--bg-tertiary);
-        border: 1px solid var(--border-color);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        font-size: 13px;
-        color: var(--text-primary);
-        animation: toastIn 0.3s ease;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .toast.success {
-        border-left: 3px solid var(--accent-green);
-      }
-
-      .toast.error {
-        border-left: 3px solid var(--accent-red);
-      }
-
-      .toast.info {
-        border-left: 3px solid var(--accent-blue);
-      }
-
-      @keyframes toastIn {
-        from {
-          opacity: 0;
-          transform: translateX(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateX(0);
-        }
-      }
-
-      /* Error Display */
-      .error-display {
-        padding: 16px;
-        color: var(--accent-red);
-        font-family: var(--font-mono);
-        font-size: 13px;
-        white-space: pre-wrap;
-      }
-
-      /* Empty State */
-      .empty-state {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-        padding: 40px;
-        text-align: center;
-        color: var(--text-muted);
-      }
-
-      .empty-state-icon {
-        font-size: 48px;
-        margin-bottom: 16px;
-        opacity: 0.5;
-      }
-
-      .empty-state-text {
-        font-size: 14px;
-        max-width: 280px;
-        line-height: 1.6;
-      }
-
-      /* Path Display */
-      .path-display {
-        padding: 8px 16px;
-        background: var(--bg-primary);
-        border-top: 1px solid var(--border-color);
-        font-family: var(--font-mono);
-        font-size: 12px;
-        color: var(--text-secondary);
-        align-items: center;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-
-      .path-display-label {
-        color: var(--text-muted);
-        margin-right: 8px;
-      }
-
-      .path-display-value {
-        color: var(--accent-cyan);
-      }
-
-      /* Stats Bar */
-      .stats-bar {
-        display: flex;
-        gap: 16px;
-        padding: 8px 16px;
-        background: var(--bg-primary);
-        border-top: 1px solid var(--border-color);
-        font-size: 12px;
-        color: var(--text-muted);
-      }
-
-      .stat-item {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-
-      .stat-value {
-        color: var(--text-secondary);
-        font-family: var(--font-mono);
-      }
-
-      /* Modal */
-      .modal-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.6);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-        animation: fadeIn 0.2s ease;
-      }
-
-      .modal-overlay.show {
-        display: flex;
-      }
-
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-        }
-        to {
-          opacity: 1;
-        }
-      }
-
-      .modal {
-        background: var(--bg-secondary);
-        border: 1px solid var(--border-color);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        max-width: 500px;
-        width: 90%;
-        animation: modalIn 0.3s ease;
-      }
-
-      @keyframes modalIn {
-        from {
-          opacity: 0;
-          transform: scale(0.95) translateY(-10px);
-        }
-        to {
-          opacity: 1;
-          transform: scale(1) translateY(0);
-        }
-      }
-
-      .modal-header {
-        padding: 16px 20px;
-        border-bottom: 1px solid var(--border-color);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-
-      .modal-title {
-        font-size: 16px;
-        font-weight: 600;
-      }
-
-      .modal-close {
-        background: none;
-        border: none;
-        color: var(--text-muted);
-        cursor: pointer;
-        font-size: 18px;
-        padding: 4px;
-        line-height: 1;
-      }
-
-      .modal-close:hover {
-        color: var(--text-primary);
-      }
-
-      .modal-body {
-        padding: 20px;
-      }
-
-      .modal-footer {
-        padding: 16px 20px;
-        border-top: 1px solid var(--border-color);
-        display: flex;
-        justify-content: flex-end;
-        gap: 8px;
-      }
-
-      /* Type Badge */
-      .type-badge {
-        font-size: 10px;
-        padding: 2px 6px;
-        border-radius: 4px;
-        margin-left: 8px;
-        font-weight: 500;
-        text-transform: uppercase;
-      }
-
-      .type-badge.object {
-        background: rgba(163, 113, 247, 0.2);
-        color: var(--accent-purple);
-      }
-
-      .type-badge.array {
-        background: rgba(57, 197, 207, 0.2);
-        color: var(--accent-cyan);
-      }
-
-      /* Keyboard Shortcuts */
-      kbd {
-        display: inline-block;
-        padding: 2px 6px;
-        font-size: 11px;
-        font-family: var(--font-mono);
-        color: var(--text-secondary);
-        background: var(--bg-primary);
-        border: 1px solid var(--border-color);
-        border-radius: 4px;
-      }
-
-      /* Scrollbar */
-      ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-      }
-
-      ::-webkit-scrollbar-track {
-        background: transparent;
-      }
-
-      ::-webkit-scrollbar-thumb {
-        background: var(--bg-hover);
-        border-radius: 4px;
-      }
-
-      ::-webkit-scrollbar-thumb:hover {
-        background: var(--text-muted);
-      }
-
-      /* Highlight */
-      .highlight {
-        background: rgba(210, 153, 34, 0.3);
-        border-radius: 2px;
-      }
-
-      /* Context Menu */
-      .context-menu {
-        position: fixed;
-        background: var(--bg-secondary);
-        border: 1px solid var(--border-color);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        min-width: 180px;
-        z-index: 1000;
-        padding: 4px 0;
-        display: none;
-      }
-
-      .context-menu.show {
-        display: block;
-      }
-
-      .context-menu-item {
-        padding: 8px 12px;
-        font-size: 13px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: var(--text-primary);
-      }
-
-      .context-menu-item:hover {
-        background: var(--bg-hover);
-      }
-
-      .context-menu-separator {
-        height: 1px;
-        background: var(--border-color);
-        margin: 4px 0;
-      }
-
-      /* Responsive */
-      @media (max-width: 768px) {
-        .header {
-          flex-direction: column;
-          padding: 12px;
-        }
-
-        .toolbar {
-          justify-content: center;
-        }
-
-        .main-container {
-          flex-direction: column;
-        }
-
-        .panel {
-          min-width: 0;
-          min-height: 200px;
-        }
-
-        .panel-left {
-          border-right: none;
-          border-bottom: 1px solid var(--border-color);
-        }
-
-        .resizer {
-          width: 100%;
-          height: 4px;
-          cursor: row-resize;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <header class="header">
-      <div class="logo">
-        <div class="logo-icon">{}</div>
-        <span>JSON Tool</span>
-      </div>
-
-      <div class="mode-tabs">
-        <button class="mode-tab active" data-mode="explorer">Explorer</button>
-        <button class="mode-tab" data-mode="diff">Diff Viewer</button>
-      </div>
-
-      <div class="status">
-        <span class="status-dot" id="statusDot"></span>
-        <span id="statusText">Ready</span>
-      </div>
-
-      <a
-        href="https://github.com/tcboni/json-tool"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="github-link"
-        title="View on GitHub"
-      >
-        <svg
-          class="github-icon"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z"
-          />
-        </svg>
-      </a>
-    </header>
-
-    <div class="clipboard-banner" id="clipboardBanner">
-      <div class="clipboard-banner-buttons">
-        <button class="btn btn-success" id="pasteClipboardBtn">
-          Paste JSON
-        </button>
-        <button class="btn" id="dismissClipboardBtn">Dismiss</button>
-      </div>
-      <div class="clipboard-banner-content">
-        <span class="clipboard-banner-text">JSON detected in clipboard:</span>
-        <span class="clipboard-banner-preview" id="clipboardPreview"></span>
-      </div>
-    </div>
-
-    <main class="main-container">
-      <section class="panel panel-left" id="panelLeft">
-        <div class="panel-header">
-          <span class="panel-title" id="leftPanelTitle">Raw JSON</span>
-          <div class="panel-actions" id="explorerActions">
-            <button class="panel-btn" id="pasteBtn" title="Paste">
-              📋 Paste
-            </button>
-            <button class="panel-btn" id="formatBtn" title="Format">
-              ✨ Format
-            </button>
-            <button class="panel-btn" id="minifyBtn" title="Minify">
-              📦 Minify
-            </button>
-            <button class="panel-btn" id="copyBtn" title="Copy">📄 Copy</button>
-            <button class="panel-btn" id="downloadBtn" title="Download">
-              💾 Download
-            </button>
-            <button class="panel-btn" id="clearBtn" title="Clear">
-              🗑️ Clear
-            </button>
-            <button class="panel-btn" id="sampleBtn" title="Sample">
-              📝 Sample
-            </button>
-          </div>
-          <div class="panel-actions" id="diffActions" style="display: none">
-            <button class="panel-btn" id="swapBtn" title="Swap">⇄ Swap</button>
-            <button class="panel-btn" id="clearDiffBtn" title="Clear">
-              🗑️ Clear
-            </button>
-          </div>
-        </div>
-
-        <!-- Explorer Mode Content -->
-        <div class="panel-content" id="explorerContent">
-          <div class="editor-wrapper">
-            <textarea
-              class="editor"
-              id="jsonEditor"
-              placeholder="Paste or type your JSON here...&#10;&#10;Tips:&#10;• Press Ctrl+V to paste&#10;• Press Ctrl+Shift+F to format&#10;• The tool auto-fixes common JSON issues"
-              spellcheck="false"
-            ></textarea>
-          </div>
-        </div>
-
-        <!-- Diff Mode Content -->
-        <div class="diff-inputs" id="diffContent" style="display: none">
-          <div class="diff-input-section">
-            <div class="diff-input-header">Original JSON</div>
-            <textarea
-              class="editor diff-editor"
-              id="diffEditorLeft"
-              placeholder="Paste original JSON here..."
-              spellcheck="false"
-            ></textarea>
-          </div>
-          <div class="diff-input-section">
-            <div class="diff-input-header">Modified JSON</div>
-            <textarea
-              class="editor diff-editor"
-              id="diffEditorRight"
-              placeholder="Paste modified JSON here..."
-              spellcheck="false"
-            ></textarea>
-          </div>
-        </div>
-
-        <div class="stats-bar" id="statsBar">
-          <div class="stat-item">
-            <span>Size:</span>
-            <span class="stat-value" id="sizeValue">0 B</span>
-          </div>
-          <div class="stat-item">
-            <span>Lines:</span>
-            <span class="stat-value" id="linesValue">0</span>
-          </div>
-          <div class="stat-item">
-            <span>Depth:</span>
-            <span class="stat-value" id="depthValue">0</span>
-          </div>
-        </div>
-      </section>
-
-      <div class="resizer" id="resizer"></div>
-
-      <section class="panel panel-right" id="panelRight">
-        <!-- Explorer Mode Header -->
-        <div class="panel-header" id="explorerRightHeader">
-          <span class="panel-title">Tree View</span>
-          <div class="panel-actions">
-            <button class="panel-btn" id="expandAllBtn">Expand All</button>
-            <button class="panel-btn" id="collapseAllBtn">Collapse All</button>
-          </div>
-        </div>
-        <div class="search-container" id="searchContainer">
-          <input
-            type="text"
-            class="search-input"
-            id="searchInput"
-            placeholder="Search keys or values... (Ctrl+F)"
-          />
-        </div>
-        <div class="panel-content scrollable" id="explorerRightContent">
-          <div class="tree-container" id="treeContainer">
-            <div class="empty-state" id="emptyState">
-              <div class="empty-state-icon">{ }</div>
-              <div class="empty-state-text">
-                Paste or type JSON in the left panel to see the interactive tree
-                view here
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="path-display" id="pathDisplay">
-          <span class="path-display-label">Path:</span>
-          <span class="path-display-value" id="pathValue">$</span>
-        </div>
-
-        <!-- Diff Mode Header -->
-        <div class="panel-header" id="diffRightHeader" style="display: none">
-          <span class="panel-title">Differences</span>
-          <div class="panel-actions">
-            <span class="diff-stats" id="diffStats"></span>
-          </div>
-        </div>
-        <div
-          class="panel-content scrollable"
-          id="diffRightContent"
-          style="display: none"
-        >
-          <div class="diff-container" id="diffContainer">
-            <div class="empty-state" id="diffEmptyState">
-              <div class="empty-state-icon">⇄</div>
-              <div class="empty-state-text">
-                Paste JSON in both panels to see the differences
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <div class="toast-container" id="toastContainer"></div>
-
-    <div class="context-menu" id="contextMenu">
-      <div class="context-menu-item" data-action="copy-value">
-        📋 Copy Value
-      </div>
-      <div class="context-menu-item" data-action="copy-path">🔗 Copy Path</div>
-      <div class="context-menu-separator"></div>
-      <div class="context-menu-item" data-action="add-property">
-        ➕ Add Property
-      </div>
-      <div class="context-menu-item" data-action="delete">🗑️ Delete</div>
-    </div>
-
-    <script>
       // ============================================
-      // JSON Tool - Core Application
+      // Mode Switching
       // ============================================
 
-      class JSONTool {
-        constructor() {
-          this.jsonData = null;
-          this.isUpdating = false;
-          this.clipboardJSON = null;
-          this.currentPath = "$";
-          this.contextMenuTarget = null;
-          this.clipboardChecked = false;
-          this.clipboardPermissionDenied = false;
-          this.currentMode = "explorer";
+      switchMode(mode) {
+        if (this.currentMode === mode) return;
+        this.currentMode = mode;
 
-          this.initElements();
-          this.initEventListeners();
-          this.checkClipboard();
+        // Update tabs
+        this.modeTabs.forEach((tab) => {
+          tab.classList.toggle("active", tab.dataset.mode === mode);
+        });
+
+        if (mode === "explorer") {
+          this.explorerContent.style.display = "";
+          this.diffContent.style.display = "none";
+          this.explorerActions.style.display = "";
+          this.diffActions.style.display = "none";
+          this.explorerRightHeader.style.display = "";
+          this.explorerRightContent.style.display = "";
+          this.diffRightHeader.style.display = "none";
+          this.diffRightContent.style.display = "none";
+          this.searchContainer.style.display = "";
+          this.pathDisplay.style.display = "";
+          this.statsBar.style.display = "";
+          this.leftPanelTitle.textContent = "Raw JSON";
+          this.setStatus("", "Ready");
+        } else {
+          this.explorerContent.style.display = "none";
+          this.diffContent.style.display = "";
+          this.explorerActions.style.display = "none";
+          this.diffActions.style.display = "";
+          this.explorerRightHeader.style.display = "none";
+          this.explorerRightContent.style.display = "none";
+          this.diffRightHeader.style.display = "";
+          this.diffRightContent.style.display = "";
+          this.searchContainer.style.display = "none";
+          this.pathDisplay.style.display = "none";
+          this.statsBar.style.display = "none";
+          this.leftPanelTitle.textContent = "Compare JSON";
+          this.setStatus("", "Diff Mode");
+          this.handleDiffInput();
+        }
+      }
+
+      // ============================================
+      // Diff Functionality
+      // ============================================
+
+      handleDiffInput() {
+        const leftText = this.diffEditorLeft.value;
+        const rightText = this.diffEditorRight.value;
+
+        if (!leftText.trim() || !rightText.trim()) {
+          this.showDiffEmpty();
+          return;
         }
 
-        // Initialize DOM elements
-        initElements() {
-          this.editor = document.getElementById("jsonEditor");
-          this.treeContainer = document.getElementById("treeContainer");
-          this.emptyState = document.getElementById("emptyState");
-          this.statusDot = document.getElementById("statusDot");
-          this.statusText = document.getElementById("statusText");
-          this.clipboardBanner = document.getElementById("clipboardBanner");
-          this.clipboardPreview = document.getElementById("clipboardPreview");
-          this.searchInput = document.getElementById("searchInput");
-          this.pathValue = document.getElementById("pathValue");
-          this.toastContainer = document.getElementById("toastContainer");
-          this.contextMenu = document.getElementById("contextMenu");
-          this.resizer = document.getElementById("resizer");
+        const leftResult = this.parseJSON(leftText);
+        const rightResult = this.parseJSON(rightText);
 
-          // Stats
-          this.sizeValue = document.getElementById("sizeValue");
-          this.linesValue = document.getElementById("linesValue");
-          this.depthValue = document.getElementById("depthValue");
-
-          // Mode elements
-          this.modeTabs = document.querySelectorAll(".mode-tab");
-          this.explorerContent = document.getElementById("explorerContent");
-          this.diffContent = document.getElementById("diffContent");
-          this.explorerActions = document.getElementById("explorerActions");
-          this.diffActions = document.getElementById("diffActions");
-          this.explorerRightHeader = document.getElementById(
-            "explorerRightHeader"
-          );
-          this.explorerRightContent = document.getElementById(
-            "explorerRightContent"
-          );
-          this.diffRightHeader = document.getElementById("diffRightHeader");
-          this.diffRightContent = document.getElementById("diffRightContent");
-          this.searchContainer = document.getElementById("searchContainer");
-          this.pathDisplay = document.getElementById("pathDisplay");
-          this.statsBar = document.getElementById("statsBar");
-          this.leftPanelTitle = document.getElementById("leftPanelTitle");
-
-          // Diff elements
-          this.diffEditorLeft = document.getElementById("diffEditorLeft");
-          this.diffEditorRight = document.getElementById("diffEditorRight");
-          this.diffContainer = document.getElementById("diffContainer");
-          this.diffEmptyState = document.getElementById("diffEmptyState");
-          this.diffStats = document.getElementById("diffStats");
+        if (!leftResult.success || !rightResult.success) {
+          this.showDiffError(leftResult, rightResult);
+          return;
         }
 
-        // Initialize event listeners
-        initEventListeners() {
-          // Editor events
-          this.editor.addEventListener("input", () => {
-            this.dismissClipboardBanner();
-            this.handleEditorInput();
-          });
-          this.editor.addEventListener("paste", (e) => this.handlePaste(e));
-          this.editor.addEventListener("focus", () =>
-            this.dismissClipboardBanner()
-          );
+        const diffs = this.compareJSON(leftResult.data, rightResult.data);
+        this.renderDiff(diffs);
+      }
 
-          // Toolbar buttons
-          document
-            .getElementById("pasteBtn")
-            .addEventListener("click", () => this.pasteFromClipboard());
-          document
-            .getElementById("formatBtn")
-            .addEventListener("click", () => this.formatJSON());
-          document
-            .getElementById("minifyBtn")
-            .addEventListener("click", () => this.minifyJSON());
-          document
-            .getElementById("copyBtn")
-            .addEventListener("click", () => this.copyToClipboard());
-          document
-            .getElementById("downloadBtn")
-            .addEventListener("click", () => this.downloadJSON());
-          document
-            .getElementById("clearBtn")
-            .addEventListener("click", () => this.clearAll());
-          document
-            .getElementById("sampleBtn")
-            .addEventListener("click", () => this.loadSample());
+      compareJSON(obj1, obj2, path = "$") {
+        const diffs = [];
 
-          // Panel buttons
-          document
-            .getElementById("expandAllBtn")
-            .addEventListener("click", () => this.expandAll());
-          document
-            .getElementById("collapseAllBtn")
-            .addEventListener("click", () => this.collapseAll());
+        const allKeys = new Set([
+          ...Object.keys(obj1 || {}),
+          ...Object.keys(obj2 || {}),
+        ]);
 
-          // Diff buttons
-          document
-            .getElementById("swapBtn")
-            .addEventListener("click", () => this.swapDiffInputs());
-          document
-            .getElementById("clearDiffBtn")
-            .addEventListener("click", () => this.clearDiff());
+        for (const key of allKeys) {
+          const currentPath =
+            Array.isArray(obj1) || Array.isArray(obj2)
+              ? `${path}[${key}]`
+              : `${path}.${key}`;
 
-          // Mode tabs
-          this.modeTabs.forEach((tab) => {
-            tab.addEventListener("click", () =>
-              this.switchMode(tab.dataset.mode)
-            );
-          });
+          const val1 = obj1?.[key];
+          const val2 = obj2?.[key];
 
-          // Diff editors
-          this.diffEditorLeft.addEventListener("input", () =>
-            this.handleDiffInput()
-          );
-          this.diffEditorRight.addEventListener("input", () =>
-            this.handleDiffInput()
-          );
-
-          // Clipboard banner
-          document
-            .getElementById("pasteClipboardBtn")
-            .addEventListener("click", () => this.pasteDetectedJSON());
-          document
-            .getElementById("dismissClipboardBtn")
-            .addEventListener("click", () => this.dismissClipboardBanner());
-
-          // Search
-          this.searchInput.addEventListener("input", () => this.handleSearch());
-
-          // Keyboard shortcuts
-          document.addEventListener("keydown", (e) => this.handleKeydown(e));
-
-          // Resizer
-          this.initResizer();
-
-          // Context menu
-          document.addEventListener("click", () => this.hideContextMenu());
-          this.contextMenu.addEventListener("click", (e) =>
-            this.handleContextMenuClick(e)
-          );
-        }
-
-        // ============================================
-        // Mode Switching
-        // ============================================
-
-        switchMode(mode) {
-          if (this.currentMode === mode) return;
-          this.currentMode = mode;
-
-          // Update tabs
-          this.modeTabs.forEach((tab) => {
-            tab.classList.toggle("active", tab.dataset.mode === mode);
-          });
-
-          if (mode === "explorer") {
-            this.explorerContent.style.display = "";
-            this.diffContent.style.display = "none";
-            this.explorerActions.style.display = "";
-            this.diffActions.style.display = "none";
-            this.explorerRightHeader.style.display = "";
-            this.explorerRightContent.style.display = "";
-            this.diffRightHeader.style.display = "none";
-            this.diffRightContent.style.display = "none";
-            this.searchContainer.style.display = "";
-            this.pathDisplay.style.display = "";
-            this.statsBar.style.display = "";
-            this.leftPanelTitle.textContent = "Raw JSON";
-            this.setStatus("", "Ready");
-          } else {
-            this.explorerContent.style.display = "none";
-            this.diffContent.style.display = "";
-            this.explorerActions.style.display = "none";
-            this.diffActions.style.display = "";
-            this.explorerRightHeader.style.display = "none";
-            this.explorerRightContent.style.display = "none";
-            this.diffRightHeader.style.display = "";
-            this.diffRightContent.style.display = "";
-            this.searchContainer.style.display = "none";
-            this.pathDisplay.style.display = "none";
-            this.statsBar.style.display = "none";
-            this.leftPanelTitle.textContent = "Compare JSON";
-            this.setStatus("", "Diff Mode");
-            this.handleDiffInput();
+          if (!(key in (obj1 || {}))) {
+            diffs.push({ type: "added", path: currentPath, value: val2 });
+          } else if (!(key in (obj2 || {}))) {
+            diffs.push({ type: "removed", path: currentPath, value: val1 });
+          } else if (
+            typeof val1 === "object" &&
+            val1 !== null &&
+            typeof val2 === "object" &&
+            val2 !== null
+          ) {
+            diffs.push(...this.compareJSON(val1, val2, currentPath));
+          } else if (val1 !== val2) {
+            diffs.push({
+              type: "changed",
+              path: currentPath,
+              oldValue: val1,
+              newValue: val2,
+            });
           }
         }
 
-        // ============================================
-        // Diff Functionality
-        // ============================================
+        return diffs;
+      }
 
-        handleDiffInput() {
-          const leftText = this.diffEditorLeft.value;
-          const rightText = this.diffEditorRight.value;
+      renderDiff(diffs) {
+        this.diffEmptyState.style.display = "none";
 
-          if (!leftText.trim() || !rightText.trim()) {
-            this.showDiffEmpty();
-            return;
-          }
-
-          const leftResult = this.parseJSON(leftText);
-          const rightResult = this.parseJSON(rightText);
-
-          if (!leftResult.success || !rightResult.success) {
-            this.showDiffError(leftResult, rightResult);
-            return;
-          }
-
-          const diffs = this.compareJSON(leftResult.data, rightResult.data);
-          this.renderDiff(diffs);
-        }
-
-        compareJSON(obj1, obj2, path = "$") {
-          const diffs = [];
-
-          const allKeys = new Set([
-            ...Object.keys(obj1 || {}),
-            ...Object.keys(obj2 || {}),
-          ]);
-
-          for (const key of allKeys) {
-            const currentPath =
-              Array.isArray(obj1) || Array.isArray(obj2)
-                ? `${path}[${key}]`
-                : `${path}.${key}`;
-
-            const val1 = obj1?.[key];
-            const val2 = obj2?.[key];
-
-            if (!(key in (obj1 || {}))) {
-              diffs.push({ type: "added", path: currentPath, value: val2 });
-            } else if (!(key in (obj2 || {}))) {
-              diffs.push({ type: "removed", path: currentPath, value: val1 });
-            } else if (
-              typeof val1 === "object" &&
-              val1 !== null &&
-              typeof val2 === "object" &&
-              val2 !== null
-            ) {
-              diffs.push(...this.compareJSON(val1, val2, currentPath));
-            } else if (val1 !== val2) {
-              diffs.push({
-                type: "changed",
-                path: currentPath,
-                oldValue: val1,
-                newValue: val2,
-              });
-            }
-          }
-
-          return diffs;
-        }
-
-        renderDiff(diffs) {
-          this.diffEmptyState.style.display = "none";
-
-          if (diffs.length === 0) {
-            this.diffContainer.innerHTML = `
+        if (diffs.length === 0) {
+          this.diffContainer.innerHTML = `
                         <div class="empty-state">
                             <div class="empty-state-icon">✓</div>
                             <div class="empty-state-text">No differences found - JSON objects are identical</div>
                         </div>
                     `;
-            this.diffStats.textContent = "No changes";
-            this.setStatus("valid", "Identical");
-            return;
-          }
+          this.diffStats.textContent = "No changes";
+          this.setStatus("valid", "Identical");
+          return;
+        }
 
-          const added = diffs.filter((d) => d.type === "added");
-          const removed = diffs.filter((d) => d.type === "removed");
-          const changed = diffs.filter((d) => d.type === "changed");
+        const added = diffs.filter((d) => d.type === "added");
+        const removed = diffs.filter((d) => d.type === "removed");
+        const changed = diffs.filter((d) => d.type === "changed");
 
-          this.diffStats.textContent = `+${added.length} -${removed.length} ~${changed.length}`;
-          this.setStatus(
-            "invalid",
-            `${diffs.length} difference${diffs.length > 1 ? "s" : ""}`
-          );
+        this.diffStats.textContent = `+${added.length} -${removed.length} ~${changed.length}`;
+        this.setStatus(
+          "invalid",
+          `${diffs.length} difference${diffs.length > 1 ? "s" : ""}`
+        );
 
-          let html = "";
+        let html = "";
 
-          if (added.length > 0) {
-            html += `<div class="diff-section">
-                        <div class="diff-section-title">Added (${
-                          added.length
-                        })</div>
+        if (added.length > 0) {
+          html += `<div class="diff-section">
+                        <div class="diff-section-title">Added (${added.length
+            })</div>
                         ${added
-                          .map(
-                            (d) => `
+              .map(
+                (d) => `
                             <div class="diff-line added">
                                 <span class="diff-prefix">+</span>
                                 <span class="diff-path">${d.path}</span>
                                 <span class="diff-value">${this.formatDiffValue(
-                                  d.value
-                                )}</span>
+                  d.value
+                )}</span>
                             </div>
                         `
-                          )
-                          .join("")}
+              )
+              .join("")}
                     </div>`;
-          }
+        }
 
-          if (removed.length > 0) {
-            html += `<div class="diff-section">
-                        <div class="diff-section-title">Removed (${
-                          removed.length
-                        })</div>
+        if (removed.length > 0) {
+          html += `<div class="diff-section">
+                        <div class="diff-section-title">Removed (${removed.length
+            })</div>
                         ${removed
-                          .map(
-                            (d) => `
+              .map(
+                (d) => `
                             <div class="diff-line removed">
                                 <span class="diff-prefix">−</span>
                                 <span class="diff-path">${d.path}</span>
                                 <span class="diff-value">${this.formatDiffValue(
-                                  d.value
-                                )}</span>
+                  d.value
+                )}</span>
                             </div>
                         `
-                          )
-                          .join("")}
+              )
+              .join("")}
                     </div>`;
-          }
+        }
 
-          if (changed.length > 0) {
-            html += `<div class="diff-section">
-                        <div class="diff-section-title">Changed (${
-                          changed.length
-                        })</div>
+        if (changed.length > 0) {
+          html += `<div class="diff-section">
+                        <div class="diff-section-title">Changed (${changed.length
+            })</div>
                         ${changed
-                          .map(
-                            (d) => `
+              .map(
+                (d) => `
                             <div class="diff-line changed">
                                 <span class="diff-prefix">~</span>
                                 <span class="diff-path">${d.path}</span>
                                 <span class="diff-value">${this.formatDiffValue(
-                                  d.oldValue
-                                )} → ${this.formatDiffValue(d.newValue)}</span>
+                  d.oldValue
+                )} → ${this.formatDiffValue(d.newValue)}</span>
                             </div>
                         `
-                          )
-                          .join("")}
+              )
+              .join("")}
                     </div>`;
-          }
-
-          this.diffContainer.innerHTML = html;
         }
 
-        formatDiffValue(value) {
-          if (value === null) return "<em>null</em>";
-          if (typeof value === "string") return `"${this.escapeHtml(value)}"`;
-          if (typeof value === "object")
-            return Array.isArray(value)
-              ? `[${value.length} items]`
-              : `{${Object.keys(value).length} keys}`;
-          return String(value);
-        }
+        this.diffContainer.innerHTML = html;
+      }
 
-        escapeHtml(text) {
-          const div = document.createElement("div");
-          div.textContent = text;
-          return div.innerHTML;
-        }
+      formatDiffValue(value) {
+        if (value === null) return "<em>null</em>";
+        if (typeof value === "string") return `"${this.escapeHtml(value)}"`;
+        if (typeof value === "object")
+          return Array.isArray(value)
+            ? `[${value.length} items]`
+            : `{${Object.keys(value).length} keys}`;
+        return String(value);
+      }
 
-        showDiffEmpty() {
-          this.diffContainer.innerHTML = `
+      escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      showDiffEmpty() {
+        this.diffContainer.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon">⇄</div>
                         <div class="empty-state-text">
@@ -1653,1045 +1617,1122 @@
                         </div>
                     </div>
                 `;
-          this.diffStats.textContent = "";
-          this.setStatus("", "Diff Mode");
-        }
+        this.diffStats.textContent = "";
+        this.setStatus("", "Diff Mode");
+      }
 
-        showDiffError(leftResult, rightResult) {
-          this.diffEmptyState.style.display = "none";
-          let errorMsg = "";
-          if (!leftResult.success)
-            errorMsg += `Original: ${leftResult.error}\n`;
-          if (!rightResult.success)
-            errorMsg += `Modified: ${rightResult.error}`;
+      showDiffError(leftResult, rightResult) {
+        this.diffEmptyState.style.display = "none";
+        let errorMsg = "";
+        if (!leftResult.success)
+          errorMsg += `Original: ${leftResult.error}\n`;
+        if (!rightResult.success)
+          errorMsg += `Modified: ${rightResult.error}`;
 
-          this.diffContainer.innerHTML = `
+        this.diffContainer.innerHTML = `
                     <div class="error-display">❌ Parse Error:\n${errorMsg}</div>
                 `;
-          this.diffStats.textContent = "Error";
-          this.setStatus("invalid", "Parse Error");
+        this.diffStats.textContent = "Error";
+        this.setStatus("invalid", "Parse Error");
+      }
+
+      swapDiffInputs() {
+        const temp = this.diffEditorLeft.value;
+        this.diffEditorLeft.value = this.diffEditorRight.value;
+        this.diffEditorRight.value = temp;
+        this.handleDiffInput();
+        this.showToast("Inputs swapped", "success");
+      }
+
+      clearDiff() {
+        this.diffEditorLeft.value = "";
+        this.diffEditorRight.value = "";
+        this.handleDiffInput();
+        this.showToast("Cleared", "info");
+      }
+
+      // ============================================
+      // JSON Parsing & Validation
+      // ============================================
+
+      parseJSON(text) {
+        if (!text || !text.trim()) {
+          return { success: false, error: "Empty input" };
         }
 
-        swapDiffInputs() {
-          const temp = this.diffEditorLeft.value;
-          this.diffEditorLeft.value = this.diffEditorRight.value;
-          this.diffEditorRight.value = temp;
-          this.handleDiffInput();
-          this.showToast("Inputs swapped", "success");
+        // Try to fix common issues
+        let fixedText = this.tryFixJSON(text);
+
+        try {
+          const data = JSON.parse(fixedText);
+          return { success: true, data, fixed: fixedText !== text };
+        } catch (e) {
+          return { success: false, error: e.message };
+        }
+      }
+
+      tryFixJSON(text) {
+        let fixed = text.trim();
+
+        // Remove BOM
+        fixed = fixed.replace(/^\uFEFF/, "");
+
+        // Try to find JSON object or array
+        const objectMatch = fixed.match(/\{[\s\S]*\}/);
+        const arrayMatch = fixed.match(/\[[\s\S]*\]/);
+
+        if (
+          objectMatch &&
+          (!arrayMatch || objectMatch.index <= arrayMatch.index)
+        ) {
+          fixed = objectMatch[0];
+        } else if (arrayMatch) {
+          fixed = arrayMatch[0];
         }
 
-        clearDiff() {
-          this.diffEditorLeft.value = "";
-          this.diffEditorRight.value = "";
-          this.handleDiffInput();
-          this.showToast("Cleared", "info");
-        }
+        // Fix trailing commas
+        fixed = fixed.replace(/,(\s*[}\]])/g, "$1");
 
-        // ============================================
-        // JSON Parsing & Validation
-        // ============================================
+        // Fix single quotes to double quotes (careful with content)
+        // This is a simple fix that might not work for all cases
+        fixed = fixed.replace(/(['"])?([a-zA-Z0-9_]+)(['"])?\s*:/g, '"$2":');
 
-        parseJSON(text) {
-          if (!text || !text.trim()) {
-            return { success: false, error: "Empty input" };
-          }
+        return fixed;
+      }
 
-          // Try to fix common issues
-          let fixedText = this.tryFixJSON(text);
+      // ============================================
+      // Editor Handling
+      // ============================================
 
-          try {
-            const data = JSON.parse(fixedText);
-            return { success: true, data, fixed: fixedText !== text };
-          } catch (e) {
-            return { success: false, error: e.message };
-          }
-        }
+      handleEditorInput() {
+        if (this.isUpdating) return;
 
-        tryFixJSON(text) {
-          let fixed = text.trim();
+        const text = this.editor.value;
+        this.updateStats(text);
 
-          // Remove BOM
-          fixed = fixed.replace(/^\uFEFF/, "");
+        const result = this.parseJSON(text);
 
-          // Try to find JSON object or array
-          const objectMatch = fixed.match(/\{[\s\S]*\}/);
-          const arrayMatch = fixed.match(/\[[\s\S]*\]/);
-
-          if (
-            objectMatch &&
-            (!arrayMatch || objectMatch.index <= arrayMatch.index)
-          ) {
-            fixed = objectMatch[0];
-          } else if (arrayMatch) {
-            fixed = arrayMatch[0];
-          }
-
-          // Fix trailing commas
-          fixed = fixed.replace(/,(\s*[}\]])/g, "$1");
-
-          // Fix single quotes to double quotes (careful with content)
-          // This is a simple fix that might not work for all cases
-          fixed = fixed.replace(/(['"])?([a-zA-Z0-9_]+)(['"])?\s*:/g, '"$2":');
-
-          return fixed;
-        }
-
-        // ============================================
-        // Editor Handling
-        // ============================================
-
-        handleEditorInput() {
-          if (this.isUpdating) return;
-
-          const text = this.editor.value;
-          this.updateStats(text);
-
-          const result = this.parseJSON(text);
-
-          if (result.success) {
-            this.jsonData = result.data;
-            this.setStatus(
-              "valid",
-              "Valid JSON" + (result.fixed ? " (auto-fixed)" : "")
-            );
-            this.renderTree();
-          } else if (text.trim()) {
-            this.jsonData = null;
-            this.setStatus("invalid", "Invalid JSON");
-            this.showTreeError(result.error);
-          } else {
-            this.jsonData = null;
-            this.setStatus("", "Ready");
-            this.showEmptyState();
-          }
-        }
-
-        handlePaste(e) {
-          // Let the default paste happen, then process
-          setTimeout(() => this.handleEditorInput(), 0);
-        }
-
-        updateStats(text) {
-          const size = new Blob([text]).size;
-          this.sizeValue.textContent = this.formatBytes(size);
-          this.linesValue.textContent = text ? text.split("\n").length : 0;
-
-          if (this.jsonData) {
-            this.depthValue.textContent = this.getDepth(this.jsonData);
-          } else {
-            this.depthValue.textContent = 0;
-          }
-        }
-
-        formatBytes(bytes) {
-          if (bytes === 0) return "0 B";
-          const k = 1024;
-          const sizes = ["B", "KB", "MB", "GB"];
-          const i = Math.floor(Math.log(bytes) / Math.log(k));
-          return (
-            parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i]
+        if (result.success) {
+          this.jsonData = result.data;
+          this.setStatus(
+            "valid",
+            "Valid JSON" + (result.fixed ? " (auto-fixed)" : "")
           );
+          this.renderTree();
+        } else if (text.trim()) {
+          this.jsonData = null;
+          this.setStatus("invalid", "Invalid JSON");
+          this.showTreeError(result.error);
+        } else {
+          this.jsonData = null;
+          this.setStatus("", "Ready");
+          this.showEmptyState();
+        }
+      }
+
+      handlePaste(e) {
+        // Let the default paste happen, then process
+        setTimeout(() => this.handleEditorInput(), 0);
+      }
+
+      updateStats(text) {
+        const size = new Blob([text]).size;
+        this.sizeValue.textContent = this.formatBytes(size);
+        this.linesValue.textContent = text ? text.split("\n").length : 0;
+
+        if (this.jsonData) {
+          this.depthValue.textContent = this.getDepth(this.jsonData);
+        } else {
+          this.depthValue.textContent = 0;
+        }
+      }
+
+      formatBytes(bytes) {
+        if (bytes === 0) return "0 B";
+        const k = 1024;
+        const sizes = ["B", "KB", "MB", "GB"];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return (
+          parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i]
+        );
+      }
+
+      getDepth(obj, current = 0) {
+        if (typeof obj !== "object" || obj === null) return current;
+        const children = Object.values(obj);
+        if (children.length === 0) return current;
+        return Math.max(
+          ...children.map((child) => this.getDepth(child, current + 1))
+        );
+      }
+
+      // ============================================
+      // Tree View Rendering
+      // ============================================
+
+      renderTree() {
+        if (!this.jsonData) {
+          this.showEmptyState();
+          return;
         }
 
-        getDepth(obj, current = 0) {
-          if (typeof obj !== "object" || obj === null) return current;
-          const children = Object.values(obj);
-          if (children.length === 0) return current;
-          return Math.max(
-            ...children.map((child) => this.getDepth(child, current + 1))
+        this.emptyState.style.display = "none";
+        const tree = this.createTreeNode(this.jsonData, "$", null, true);
+        this.treeContainer.innerHTML = "";
+        this.treeContainer.appendChild(tree);
+      }
+
+      createTreeNode(data, path, key = null, isRoot = false) {
+        const container = document.createElement("div");
+        container.className = "tree-node";
+
+        const type = this.getType(data);
+        const isExpandable = type === "object" || type === "array";
+
+        const item = document.createElement("div");
+        item.className = "tree-item";
+
+        // Toggle button for expandable items
+        if (isExpandable) {
+          const toggle = document.createElement("span");
+          toggle.className = "tree-toggle expanded";
+          item.appendChild(toggle);
+
+          // Make entire row clickable for expand/collapse
+          item.style.cursor = "pointer";
+          item.addEventListener("click", (e) => {
+            // Don't toggle if clicking on editable content
+            if (e.target.contentEditable === "true") return;
+            this.toggleNode(toggle);
+            const currentPath = this.getPathFromElement(item);
+            this.pathValue.textContent = currentPath;
+            this.currentPath = currentPath;
+          });
+        }
+
+        // Key (for object properties)
+        if (key !== null && !Array.isArray(this.getParentData(path))) {
+          const keySpan = document.createElement("span");
+          keySpan.className = "tree-key";
+          keySpan.textContent = key;
+          keySpan.contentEditable = true;
+          keySpan.dataset.originalKey = key;
+          keySpan.addEventListener("blur", (e) =>
+            this.handleKeyEdit(e, path)
           );
+          keySpan.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              e.target.blur();
+            }
+          });
+          keySpan.addEventListener("focus", () => {
+            const currentPath = this.getPathFromElement(keySpan);
+            this.pathValue.textContent = currentPath;
+            this.currentPath = currentPath;
+          });
+          item.appendChild(keySpan);
+        } else if (key !== null) {
+          const indexSpan = document.createElement("span");
+          indexSpan.className = "tree-index";
+          indexSpan.textContent = `[${key}]`;
+          item.appendChild(indexSpan);
         }
 
-        // ============================================
-        // Tree View Rendering
-        // ============================================
+        // Value
+        const valueSpan = document.createElement("span");
+        valueSpan.className = "tree-value " + type;
 
-        renderTree() {
-          if (!this.jsonData) {
-            this.showEmptyState();
-            return;
-          }
+        if (isExpandable) {
+          const bracket = document.createElement("span");
+          bracket.className = "tree-bracket";
+          bracket.textContent = type === "array" ? "[" : "{";
+          valueSpan.appendChild(bracket);
 
-          this.emptyState.style.display = "none";
-          const tree = this.createTreeNode(this.jsonData, "$", null, true);
-          this.treeContainer.innerHTML = "";
-          this.treeContainer.appendChild(tree);
-        }
+          const summary = document.createElement("span");
+          summary.className = "tree-summary";
+          const count =
+            type === "array" ? data.length : Object.keys(data).length;
+          summary.textContent = `${count} ${count === 1 ? "item" : "items"}`;
+          valueSpan.appendChild(summary);
 
-        createTreeNode(data, path, key = null, isRoot = false) {
-          const container = document.createElement("div");
-          container.className = "tree-node";
-          container.dataset.path = path;
+          const badge = document.createElement("span");
+          badge.className = "type-badge " + type;
+          badge.textContent = type;
+          valueSpan.appendChild(badge);
 
-          const type = this.getType(data);
-          const isExpandable = type === "object" || type === "array";
-
-          const item = document.createElement("div");
-          item.className = "tree-item";
-
-          // Toggle button for expandable items
-          if (isExpandable) {
-            const toggle = document.createElement("span");
-            toggle.className = "tree-toggle expanded";
-            item.appendChild(toggle);
-
-            // Make entire row clickable for expand/collapse
-            item.style.cursor = "pointer";
-            item.addEventListener("click", (e) => {
-              // Don't toggle if clicking on editable content
-              if (e.target.contentEditable === "true") return;
-              this.toggleNode(toggle);
-              this.pathValue.textContent = path;
-              this.currentPath = path;
+          // Add button for objects/arrays
+          const actions = document.createElement("span");
+          actions.className = "tree-actions";
+          const addBtn = document.createElement("button");
+          addBtn.className = "tree-action-btn add";
+          addBtn.textContent = "+";
+          addBtn.title = "Add " + (type === "array" ? "item" : "property");
+          addBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            this.addNewItem(path, type, data);
+          });
+          actions.appendChild(addBtn);
+          valueSpan.appendChild(actions);
+        } else {
+          // Boolean: add checkbox
+          if (type === "boolean") {
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.className = "bool-checkbox";
+            checkbox.checked = data === true;
+            checkbox.addEventListener("change", (e) => {
+              e.stopPropagation();
+              const parts = this.parsePath(path);
+              this.setValueAtPath(parts, checkbox.checked);
+              textSpan.textContent = String(checkbox.checked);
+              this.syncEditorFromTree();
             });
-          }
+            valueSpan.appendChild(checkbox);
 
-          // Key (for object properties)
-          if (key !== null && !Array.isArray(this.getParentData(path))) {
-            const keySpan = document.createElement("span");
-            keySpan.className = "tree-key";
-            keySpan.textContent = key;
-            keySpan.contentEditable = true;
-            keySpan.dataset.originalKey = key;
-            keySpan.addEventListener("blur", (e) =>
-              this.handleKeyEdit(e, path)
+            const textSpan = document.createElement("span");
+            textSpan.className = "bool-label";
+            textSpan.textContent = String(data);
+            textSpan.contentEditable = true;
+            textSpan.dataset.type = type;
+            textSpan.addEventListener("blur", (e) =>
+              this.handleBooleanEdit(e, path, checkbox)
             );
-            keySpan.addEventListener("keydown", (e) => {
+            textSpan.addEventListener("keydown", (e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
                 e.target.blur();
               }
             });
-            item.appendChild(keySpan);
-          } else if (key !== null) {
-            const indexSpan = document.createElement("span");
-            indexSpan.className = "tree-index";
-            indexSpan.textContent = `[${key}]`;
-            item.appendChild(indexSpan);
-          }
-
-          // Value
-          const valueSpan = document.createElement("span");
-          valueSpan.className = "tree-value " + type;
-
-          if (isExpandable) {
-            const bracket = document.createElement("span");
-            bracket.className = "tree-bracket";
-            bracket.textContent = type === "array" ? "[" : "{";
-            valueSpan.appendChild(bracket);
-
-            const summary = document.createElement("span");
-            summary.className = "tree-summary";
-            const count =
-              type === "array" ? data.length : Object.keys(data).length;
-            summary.textContent = `${count} ${count === 1 ? "item" : "items"}`;
-            valueSpan.appendChild(summary);
-
-            const badge = document.createElement("span");
-            badge.className = "type-badge " + type;
-            badge.textContent = type;
-            valueSpan.appendChild(badge);
-
-            // Add button for objects/arrays
-            const actions = document.createElement("span");
-            actions.className = "tree-actions";
-            const addBtn = document.createElement("button");
-            addBtn.className = "tree-action-btn add";
-            addBtn.textContent = "+";
-            addBtn.title = "Add " + (type === "array" ? "item" : "property");
-            addBtn.addEventListener("click", (e) => {
-              e.stopPropagation();
-              this.addNewItem(path, type, data);
+            textSpan.addEventListener("focus", () => {
+              const currentPath = this.getPathFromElement(textSpan);
+              this.pathValue.textContent = currentPath;
+              this.currentPath = currentPath;
             });
-            actions.appendChild(addBtn);
-            valueSpan.appendChild(actions);
+            valueSpan.appendChild(textSpan);
           } else {
-            // Boolean: add checkbox
-            if (type === "boolean") {
-              const checkbox = document.createElement("input");
-              checkbox.type = "checkbox";
-              checkbox.className = "bool-checkbox";
-              checkbox.checked = data === true;
-              checkbox.addEventListener("change", (e) => {
-                e.stopPropagation();
-                const parts = this.parsePath(path);
-                this.setValueAtPath(parts, checkbox.checked);
-                textSpan.textContent = String(checkbox.checked);
-                this.syncEditorFromTree();
-              });
-              valueSpan.appendChild(checkbox);
-
-              const textSpan = document.createElement("span");
-              textSpan.className = "bool-label";
-              textSpan.textContent = String(data);
-              textSpan.contentEditable = true;
-              textSpan.dataset.type = type;
-              textSpan.dataset.path = path;
-              textSpan.addEventListener("blur", (e) =>
-                this.handleBooleanEdit(e, path, checkbox)
-              );
-              textSpan.addEventListener("keydown", (e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  e.target.blur();
-                }
-              });
-              textSpan.addEventListener("focus", () => {
-                this.pathValue.textContent = path;
-                this.currentPath = path;
-              });
-              valueSpan.appendChild(textSpan);
-            } else {
-              valueSpan.textContent = this.formatValue(data, type);
-              valueSpan.contentEditable = true;
-              valueSpan.dataset.type = type;
-              valueSpan.addEventListener("blur", (e) =>
-                this.handleValueEdit(e, path)
-              );
-              valueSpan.addEventListener("keydown", (e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  e.target.blur();
-                }
-              });
-              valueSpan.addEventListener("focus", () => {
-                this.pathValue.textContent = path;
-                this.currentPath = path;
-              });
-            }
-          }
-
-          item.appendChild(valueSpan);
-
-          // Delete button (not for root)
-          if (!isRoot) {
-            const actions = document.createElement("span");
-            actions.className = "tree-actions tree-item-actions";
-            const deleteBtn = document.createElement("button");
-            deleteBtn.className = "tree-action-btn delete";
-            deleteBtn.textContent = "×";
-            deleteBtn.title = "Delete";
-            deleteBtn.addEventListener("click", (e) => {
-              e.stopPropagation();
-              this.deleteAtPath(path);
+            valueSpan.textContent = this.formatValue(data, type);
+            valueSpan.contentEditable = true;
+            valueSpan.dataset.type = type;
+            valueSpan.addEventListener("blur", (e) =>
+              this.handleValueEdit(e, path)
+            );
+            valueSpan.addEventListener("keydown", (e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                e.target.blur();
+              }
             });
-            actions.appendChild(deleteBtn);
-            item.appendChild(actions);
+            valueSpan.addEventListener("focus", () => {
+              const currentPath = this.getPathFromElement(valueSpan);
+              this.pathValue.textContent = currentPath;
+              this.currentPath = currentPath;
+            });
           }
+        }
 
-          // Context menu
-          item.addEventListener("contextmenu", (e) => {
-            e.preventDefault();
-            this.showContextMenu(e, path, data);
+        item.appendChild(valueSpan);
+
+        // Delete button (not for root)
+        if (!isRoot) {
+          const actions = document.createElement("span");
+          actions.className = "tree-actions tree-item-actions";
+          const deleteBtn = document.createElement("button");
+          deleteBtn.className = "tree-action-btn delete";
+          deleteBtn.textContent = "×";
+          deleteBtn.title = "Delete";
+          deleteBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            this.deleteAtPath(path);
           });
-
-          // Update path display on click (for non-expandable items)
-          if (!isExpandable) {
-            item.addEventListener("click", () => {
-              this.pathValue.textContent = path;
-              this.currentPath = path;
-            });
-          }
-
-          container.appendChild(item);
-
-          // Children for expandable items
-          if (isExpandable) {
-            const children = document.createElement("div");
-            children.className = "tree-children";
-
-            if (type === "array") {
-              data.forEach((child, index) => {
-                const childPath = `${path}[${index}]`;
-                children.appendChild(
-                  this.createTreeNode(child, childPath, index)
-                );
-              });
-            } else {
-              Object.entries(data).forEach(([childKey, child]) => {
-                const childPath = `${path}.${childKey}`;
-                children.appendChild(
-                  this.createTreeNode(child, childPath, childKey)
-                );
-              });
-            }
-
-            // Closing bracket
-            const closingItem = document.createElement("div");
-            closingItem.className = "tree-item";
-            closingItem.style.paddingLeft = "4px";
-            const closingBracket = document.createElement("span");
-            closingBracket.className = "tree-bracket";
-            closingBracket.textContent = type === "array" ? "]" : "}";
-            closingItem.appendChild(closingBracket);
-            children.appendChild(closingItem);
-
-            container.appendChild(children);
-          }
-
-          return container;
+          actions.appendChild(deleteBtn);
+          item.appendChild(actions);
         }
 
-        getType(value) {
-          if (value === null) return "null";
-          if (Array.isArray(value)) return "array";
-          return typeof value;
+        // Context menu
+        item.addEventListener("contextmenu", (e) => {
+          e.preventDefault();
+          this.showContextMenu(e, path, data);
+        });
+
+        // Update path display on click (for non-expandable items)
+        if (!isExpandable) {
+          item.addEventListener("click", () => {
+            const currentPath = this.getPathFromElement(item);
+            this.pathValue.textContent = currentPath;
+            this.currentPath = currentPath;
+          });
         }
 
-        formatValue(value, type) {
-          if (type === "string") return `"${value}"`;
-          if (type === "null") return "";
-          if (type === "boolean") return String(value);
-          return String(value);
-        }
+        container.appendChild(item);
 
-        getParentData(path) {
-          const parts = this.parsePath(path);
-          parts.pop();
-          return this.getValueAtPath(parts);
-        }
-
-        parsePath(path) {
-          const parts = [];
-          const regex = /\.([^.\[\]]+)|\[(\d+)\]/g;
-          let match;
-          while ((match = regex.exec(path)) !== null) {
-            if (match[1] !== undefined) parts.push(match[1]);
-            if (match[2] !== undefined) parts.push(parseInt(match[2]));
-          }
-          return parts;
-        }
-
-        getValueAtPath(parts) {
-          let current = this.jsonData;
-          for (const part of parts) {
-            if (current === null || current === undefined) return undefined;
-            current = current[part];
-          }
-          return current;
-        }
-
-        setValueAtPath(parts, value) {
-          if (parts.length === 0) {
-            this.jsonData = value;
-            return;
-          }
-
-          let current = this.jsonData;
-          for (let i = 0; i < parts.length - 1; i++) {
-            current = current[parts[i]];
-          }
-          current[parts[parts.length - 1]] = value;
-        }
-
-        toggleNode(toggle) {
-          const isExpanded = toggle.classList.contains("expanded");
-          const children = toggle
-            .closest(".tree-node")
-            .querySelector(".tree-children");
-
-          if (isExpanded) {
-            toggle.classList.remove("expanded");
-            toggle.classList.add("collapsed");
-            children.classList.add("collapsed");
-          } else {
-            toggle.classList.remove("collapsed");
-            toggle.classList.add("expanded");
-            children.classList.remove("collapsed");
-          }
-        }
-
-        // ============================================
-        // Tree Editing
-        // ============================================
-
-        handleValueEdit(e, path) {
-          const span = e.target;
-          let newValue = span.textContent;
-          const oldType = span.dataset.type;
-
-          // Parse the new value
-          let parsedValue;
-          let newType;
-
-          const trimmed = newValue.trim();
-
-          // Empty = null
-          if (trimmed === "" || trimmed === "null") {
-            parsedValue = null;
-            newType = "null";
-          }
-          // Try to parse as JSON (arrays, objects)
-          else if (
-            (trimmed.startsWith("[") && trimmed.endsWith("]")) ||
-            (trimmed.startsWith("{") && trimmed.endsWith("}"))
-          ) {
-            try {
-              parsedValue = JSON.parse(trimmed);
-              newType = Array.isArray(parsedValue) ? "array" : "object";
-            } catch (e) {
-              // Invalid JSON, treat as string
-              parsedValue = trimmed;
-              newType = "string";
-            }
-          }
-          // Quoted string - user explicitly wants a string
-          else if (
-            newValue.startsWith('"') &&
-            newValue.endsWith('"') &&
-            newValue.length >= 2
-          ) {
-            parsedValue = newValue.slice(1, -1);
-            newType = "string";
-          }
-          // Boolean
-          else if (trimmed === "true") {
-            parsedValue = true;
-            newType = "boolean";
-          } else if (trimmed === "false") {
-            parsedValue = false;
-            newType = "boolean";
-          }
-          // Number
-          else if (!isNaN(trimmed) && trimmed !== "") {
-            parsedValue = parseFloat(trimmed);
-            newType = "number";
-          }
-          // Anything else becomes a string
-          else {
-            parsedValue = trimmed;
-            newType = "string";
-          }
-
-          // Update the data
-          const parts = this.parsePath(path);
-          this.setValueAtPath(parts, parsedValue);
-          this.syncEditorFromTree();
-
-          // Re-render tree if type changed (to get correct UI like checkbox for boolean, or expandable for array/object)
-          if (
-            oldType !== newType ||
-            newType === "array" ||
-            newType === "object"
-          ) {
-            this.renderTree();
-          } else {
-            // Just update display
-            span.dataset.type = newType;
-            span.className = "tree-value " + newType;
-            span.textContent = this.formatValue(parsedValue, newType);
-          }
-        }
-
-        addNewItem(path, type, data) {
-          const parts = this.parsePath(path);
-          const target = parts.length
-            ? this.getValueAtPath(parts)
-            : this.jsonData;
+        // Children for expandable items
+        if (isExpandable) {
+          const children = document.createElement("div");
+          children.className = "tree-children";
 
           if (type === "array") {
-            target.push(null);
-          } else {
-            // Find a unique key name
-            let keyNum = 1;
-            let newKey = "newKey";
-            while (newKey in target) {
-              newKey = `newKey${keyNum++}`;
-            }
-            target[newKey] = null;
-          }
-
-          this.syncEditorFromTree();
-          this.renderTree();
-        }
-
-        handleBooleanEdit(e, path, checkbox) {
-          const span = e.target;
-          const newValue = span.textContent.trim();
-          const parts = this.parsePath(path);
-
-          if (newValue === "true") {
-            this.setValueAtPath(parts, true);
-            checkbox.checked = true;
-            span.textContent = "true";
-          } else if (newValue === "false") {
-            this.setValueAtPath(parts, false);
-            checkbox.checked = false;
-            span.textContent = "false";
-          } else if (newValue === "" || newValue === "null") {
-            // Convert to null
-            this.setValueAtPath(parts, null);
-            this.renderTree(); // Re-render since type changed
-          } else {
-            // Convert to string
-            this.setValueAtPath(parts, newValue);
-            this.renderTree(); // Re-render since type changed
-          }
-
-          this.syncEditorFromTree();
-        }
-
-        handleKeyEdit(e, path) {
-          const span = e.target;
-          const newKey = span.textContent.trim();
-          const oldKey = span.dataset.originalKey;
-
-          if (newKey === oldKey || !newKey) {
-            span.textContent = oldKey;
-            return;
-          }
-
-          const parts = this.parsePath(path);
-          const parentParts = parts.slice(0, -1);
-          const parent = parentParts.length
-            ? this.getValueAtPath(parentParts)
-            : this.jsonData;
-
-          if (parent && typeof parent === "object" && !Array.isArray(parent)) {
-            const value = parent[oldKey];
-            delete parent[oldKey];
-            parent[newKey] = value;
-            span.dataset.originalKey = newKey;
-            this.syncEditorFromTree();
-          }
-        }
-
-        syncEditorFromTree() {
-          this.isUpdating = true;
-          this.editor.value = JSON.stringify(this.jsonData, null, 2);
-          this.updateStats(this.editor.value);
-          this.isUpdating = false;
-        }
-
-        // ============================================
-        // UI State
-        // ============================================
-
-        setStatus(state, message) {
-          this.statusDot.className = "status-dot " + state;
-          this.statusText.textContent = message;
-        }
-
-        showEmptyState() {
-          this.emptyState.style.display = "flex";
-          const tree = this.treeContainer.querySelector(".tree-node");
-          if (tree) tree.remove();
-        }
-
-        showTreeError(error) {
-          this.emptyState.style.display = "none";
-          const existingTree = this.treeContainer.querySelector(".tree-node");
-          if (existingTree) existingTree.remove();
-
-          const errorDiv = document.createElement("div");
-          errorDiv.className = "error-display";
-          errorDiv.textContent = "❌ Parse Error:\n" + error;
-
-          const existingError =
-            this.treeContainer.querySelector(".error-display");
-          if (existingError) existingError.remove();
-
-          this.treeContainer.appendChild(errorDiv);
-        }
-
-        // ============================================
-        // Clipboard Handling
-        // ============================================
-
-        async checkClipboard() {
-          // Only check once
-          if (this.clipboardChecked) return;
-          this.clipboardChecked = true;
-
-          try {
-            const text = await navigator.clipboard.readText();
-            if (!text || !text.trim()) return;
-
-            const result = this.parseJSON(text);
-
-            if (result.success) {
-              this.clipboardJSON = text;
-              this.clipboardPreview.textContent = text.substring(0, 500);
-              this.clipboardBanner.classList.add("show");
-            }
-          } catch (e) {
-            // Clipboard access denied or empty - silently fail
-          }
-        }
-
-        async pasteFromClipboard() {
-          try {
-            const text = await navigator.clipboard.readText();
-            this.editor.value = text;
-            this.handleEditorInput();
-            this.clipboardBanner.classList.remove("show");
-            this.showToast("Pasted from clipboard", "success");
-          } catch (e) {
-            this.showToast("Could not access clipboard", "error");
-          }
-        }
-
-        pasteDetectedJSON() {
-          if (this.clipboardJSON) {
-            this.editor.value = this.clipboardJSON;
-            this.handleEditorInput();
-            this.clipboardBanner.classList.remove("show");
-            this.showToast("JSON pasted successfully", "success");
-          }
-        }
-
-        dismissClipboardBanner() {
-          this.clipboardBanner.classList.remove("show");
-        }
-
-        async copyToClipboard() {
-          const text = this.editor.value;
-          if (!text) {
-            this.showToast("Nothing to copy", "info");
-            return;
-          }
-
-          try {
-            await navigator.clipboard.writeText(text);
-            this.showToast("Copied to clipboard", "success");
-          } catch (e) {
-            this.showToast("Could not copy to clipboard", "error");
-          }
-        }
-
-        // ============================================
-        // JSON Operations
-        // ============================================
-
-        formatJSON() {
-          if (!this.jsonData) {
-            this.showToast("No valid JSON to format", "error");
-            return;
-          }
-
-          this.isUpdating = true;
-          this.editor.value = JSON.stringify(this.jsonData, null, 2);
-          this.updateStats(this.editor.value);
-          this.isUpdating = false;
-          this.showToast("JSON formatted", "success");
-        }
-
-        minifyJSON() {
-          if (!this.jsonData) {
-            this.showToast("No valid JSON to minify", "error");
-            return;
-          }
-
-          this.isUpdating = true;
-          this.editor.value = JSON.stringify(this.jsonData);
-          this.updateStats(this.editor.value);
-          this.isUpdating = false;
-          this.showToast("JSON minified", "success");
-        }
-
-        downloadJSON() {
-          const text = this.editor.value;
-          if (!text) {
-            this.showToast("Nothing to download", "info");
-            return;
-          }
-
-          const blob = new Blob([text], { type: "application/json" });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = "data.json";
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-          this.showToast("Downloaded as data.json", "success");
-        }
-
-        clearAll() {
-          this.editor.value = "";
-          this.jsonData = null;
-          this.setStatus("", "Ready");
-          this.showEmptyState();
-          this.updateStats("");
-          this.pathValue.textContent = "$";
-          this.searchInput.value = "";
-
-          const errorDisplay =
-            this.treeContainer.querySelector(".error-display");
-          if (errorDisplay) errorDisplay.remove();
-
-          this.showToast("Cleared", "info");
-        }
-
-        loadSample() {
-          const sample = {
-            name: "JSON Tool",
-            version: "1.0.0",
-            description: "A powerful JSON viewer and editor",
-            features: [
-              "Format & minify",
-              "Tree view",
-              "Live editing",
-              "Search & filter",
-              "Copy & download",
-            ],
-            settings: {
-              theme: "dark",
-              autoFormat: true,
-              expandDepth: 3,
-            },
-            stats: {
-              users: 1000,
-              rating: 4.8,
-              isActive: true,
-              lastUpdate: null,
-            },
-            nested: {
-              level1: {
-                level2: {
-                  level3: {
-                    value: "Deep nesting example",
-                  },
-                },
-              },
-            },
-          };
-
-          this.editor.value = JSON.stringify(sample, null, 2);
-          this.handleEditorInput();
-          this.showToast("Sample JSON loaded", "success");
-        }
-
-        // ============================================
-        // Search
-        // ============================================
-
-        handleSearch() {
-          const query = this.searchInput.value.toLowerCase().trim();
-          const items = this.treeContainer.querySelectorAll(".tree-item");
-
-          items.forEach((item) => {
-            item.classList.remove("highlight");
-          });
-
-          if (!query) return;
-
-          items.forEach((item) => {
-            const text = item.textContent.toLowerCase();
-            if (text.includes(query)) {
-              item.classList.add("highlight");
-
-              // Expand parent nodes
-              let parent = item.closest(".tree-children");
-              while (parent) {
-                parent.classList.remove("collapsed");
-                const toggle =
-                  parent.previousElementSibling?.querySelector(".tree-toggle");
-                if (toggle) {
-                  toggle.classList.remove("collapsed");
-                  toggle.classList.add("expanded");
-                }
-                parent = parent.parentElement?.closest(".tree-children");
-              }
-            }
-          });
-        }
-
-        // ============================================
-        // Expand/Collapse
-        // ============================================
-
-        expandAll() {
-          const toggles = this.treeContainer.querySelectorAll(".tree-toggle");
-          const children =
-            this.treeContainer.querySelectorAll(".tree-children");
-
-          toggles.forEach((t) => {
-            t.classList.remove("collapsed");
-            t.classList.add("expanded");
-          });
-
-          children.forEach((c) => c.classList.remove("collapsed"));
-        }
-
-        collapseAll() {
-          const toggles = this.treeContainer.querySelectorAll(".tree-toggle");
-          const children =
-            this.treeContainer.querySelectorAll(".tree-children");
-
-          toggles.forEach((t) => {
-            t.classList.remove("expanded");
-            t.classList.add("collapsed");
-          });
-
-          children.forEach((c) => c.classList.add("collapsed"));
-        }
-
-        // ============================================
-        // Context Menu
-        // ============================================
-
-        showContextMenu(e, path, data) {
-          this.contextMenuTarget = { path, data };
-          this.contextMenu.style.left = e.pageX + "px";
-          this.contextMenu.style.top = e.pageY + "px";
-          this.contextMenu.classList.add("show");
-        }
-
-        hideContextMenu() {
-          this.contextMenu.classList.remove("show");
-        }
-
-        async handleContextMenuClick(e) {
-          const action = e.target.dataset.action;
-          if (!action || !this.contextMenuTarget) return;
-
-          const { path, data } = this.contextMenuTarget;
-
-          switch (action) {
-            case "copy-value":
-              const valueToCopy =
-                typeof data === "object"
-                  ? JSON.stringify(data, null, 2)
-                  : String(data);
-              await navigator.clipboard.writeText(valueToCopy);
-              this.showToast("Value copied", "success");
-              break;
-            case "copy-path":
-              await navigator.clipboard.writeText(path);
-              this.showToast("Path copied", "success");
-              break;
-            case "delete":
-              this.deleteAtPath(path);
-              break;
-            case "add-property":
-              this.showToast(
-                "Click on a value to edit, or modify the raw JSON",
-                "info"
+            data.forEach((child, index) => {
+              const childPath = `${path}[${index}]`;
+              children.appendChild(
+                this.createTreeNode(child, childPath, index)
               );
-              break;
+            });
+          } else {
+            Object.entries(data).forEach(([childKey, child]) => {
+              const childPath = `${path}.${childKey}`;
+              children.appendChild(
+                this.createTreeNode(child, childPath, childKey)
+              );
+            });
           }
 
-          this.hideContextMenu();
+          // Closing bracket
+          const closingItem = document.createElement("div");
+          closingItem.className = "tree-item";
+          closingItem.style.paddingLeft = "4px";
+          const closingBracket = document.createElement("span");
+          closingBracket.className = "tree-bracket";
+          closingBracket.textContent = type === "array" ? "]" : "}";
+          closingItem.appendChild(closingBracket);
+          children.appendChild(closingItem);
+
+          container.appendChild(children);
         }
 
-        deleteAtPath(path) {
-          const parts = this.parsePath(path);
-          if (parts.length === 0) {
-            this.clearAll();
-            return;
-          }
+        return container;
+      }
 
-          const parentParts = parts.slice(0, -1);
-          const key = parts[parts.length - 1];
-          const parent = parentParts.length
-            ? this.getValueAtPath(parentParts)
-            : this.jsonData;
+      getType(value) {
+        if (value === null) return "null";
+        if (Array.isArray(value)) return "array";
+        return typeof value;
+      }
 
-          if (Array.isArray(parent)) {
-            parent.splice(key, 1);
-          } else if (typeof parent === "object") {
-            delete parent[key];
-          }
+      formatValue(value, type) {
+        if (type === "string") return `"${value}"`;
+        if (type === "null") return "";
+        if (type === "boolean") return String(value);
+        return String(value);
+      }
 
-          this.syncEditorFromTree();
-          this.renderTree();
-          this.showToast("Deleted", "success");
+      getParentData(path) {
+        const parts = this.parsePath(path);
+        parts.pop();
+        return this.getValueAtPath(parts);
+      }
+
+      parsePath(path) {
+        const parts = [];
+        const regex = /\.([^.\[\]]+)|\[(\d+)\]/g;
+        let match;
+        while ((match = regex.exec(path)) !== null) {
+          if (match[1] !== undefined) parts.push(match[1]);
+          if (match[2] !== undefined) parts.push(parseInt(match[2]));
+        }
+        return parts;
+      }
+
+      getValueAtPath(parts) {
+        let current = this.jsonData;
+        for (const part of parts) {
+          if (current === null || current === undefined) return undefined;
+          current = current[part];
+        }
+        return current;
+      }
+
+      setValueAtPath(parts, value) {
+        if (parts.length === 0) {
+          this.jsonData = value;
+          return;
         }
 
-        // ============================================
-        // Resizer
-        // ============================================
-
-        initResizer() {
-          let isResizing = false;
-          const leftPanel = document.querySelector(".panel-left");
-          const rightPanel = document.querySelector(".panel-right");
-
-          this.resizer.addEventListener("mousedown", (e) => {
-            isResizing = true;
-            this.resizer.classList.add("active");
-          });
-
-          document.addEventListener("mousemove", (e) => {
-            if (!isResizing) return;
-
-            const containerRect = document
-              .querySelector(".main-container")
-              .getBoundingClientRect();
-            const percentage =
-              ((e.clientX - containerRect.left) / containerRect.width) * 100;
-
-            if (percentage > 20 && percentage < 80) {
-              leftPanel.style.flex = `0 1 ${percentage}%`;
-              rightPanel.style.flex = `0 1 ${100 - percentage}%`;
-            }
-          });
-
-          document.addEventListener("mouseup", () => {
-            isResizing = false;
-            this.resizer.classList.remove("active");
-          });
+        let current = this.jsonData;
+        for (let i = 0; i < parts.length - 1; i++) {
+          current = current[parts[i]];
         }
+        current[parts[parts.length - 1]] = value;
+      }
 
-        // ============================================
-        // Keyboard Shortcuts
-        // ============================================
+      toggleNode(toggle) {
+        const isExpanded = toggle.classList.contains("expanded");
+        const children = toggle
+          .closest(".tree-node")
+          .querySelector(".tree-children");
 
-        handleKeydown(e) {
-          // Ctrl/Cmd + Shift + F - Format
-          if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "F") {
-            e.preventDefault();
-            this.formatJSON();
-          }
-
-          // Ctrl/Cmd + F - Focus search
-          if ((e.ctrlKey || e.metaKey) && e.key === "f" && !e.shiftKey) {
-            if (document.activeElement !== this.editor) {
-              e.preventDefault();
-              this.searchInput.focus();
-            }
-          }
-
-          // Ctrl/Cmd + Z - Undo
-          if ((e.ctrlKey || e.metaKey) && e.key === "z" && !e.shiftKey) {
-            if (document.activeElement === this.editor) {
-              // Let browser handle it
-            }
-          }
-
-          // Escape - Clear search
-          if (e.key === "Escape") {
-            this.searchInput.value = "";
-            this.handleSearch();
-            this.searchInput.blur();
-          }
-        }
-
-        // ============================================
-        // Toast Notifications
-        // ============================================
-
-        showToast(message, type = "info") {
-          const toast = document.createElement("div");
-          toast.className = `toast ${type}`;
-          toast.textContent = message;
-
-          this.toastContainer.appendChild(toast);
-
-          setTimeout(() => {
-            toast.style.opacity = "0";
-            toast.style.transform = "translateX(20px)";
-            setTimeout(() => toast.remove(), 300);
-          }, 2500);
+        if (isExpanded) {
+          toggle.classList.remove("expanded");
+          toggle.classList.add("collapsed");
+          children.classList.add("collapsed");
+        } else {
+          toggle.classList.remove("collapsed");
+          toggle.classList.add("expanded");
+          children.classList.remove("collapsed");
         }
       }
 
-      // Initialize the app
-      document.addEventListener("DOMContentLoaded", () => {
-        window.jsonTool = new JSONTool();
-      });
-    </script>
-  </body>
+      // ============================================
+      // Tree Editing
+      // ============================================
+
+      handleValueEdit(e, path) {
+        const span = e.target;
+        let newValue = span.textContent;
+        const oldType = span.dataset.type;
+
+        // Get current path from DOM (in case key was renamed)
+        const currentPath = this.getPathFromElement(span);
+
+        // Parse the new value
+        let parsedValue;
+        let newType;
+
+        const trimmed = newValue.trim();
+
+        // Empty = null
+        if (trimmed === "" || trimmed === "null") {
+          parsedValue = null;
+          newType = "null";
+        }
+        // Try to parse as JSON (arrays, objects)
+        else if (
+          (trimmed.startsWith("[") && trimmed.endsWith("]")) ||
+          (trimmed.startsWith("{") && trimmed.endsWith("}"))
+        ) {
+          try {
+            parsedValue = JSON.parse(trimmed);
+            newType = Array.isArray(parsedValue) ? "array" : "object";
+          } catch (e) {
+            // Invalid JSON, treat as string
+            parsedValue = trimmed;
+            newType = "string";
+          }
+        }
+        // Quoted string - user explicitly wants a string
+        else if (
+          newValue.startsWith('"') &&
+          newValue.endsWith('"') &&
+          newValue.length >= 2
+        ) {
+          parsedValue = newValue.slice(1, -1);
+          newType = "string";
+        }
+        // Boolean
+        else if (trimmed === "true") {
+          parsedValue = true;
+          newType = "boolean";
+        } else if (trimmed === "false") {
+          parsedValue = false;
+          newType = "boolean";
+        }
+        // Number
+        else if (!isNaN(trimmed) && trimmed !== "") {
+          parsedValue = parseFloat(trimmed);
+          newType = "number";
+        }
+        // Anything else becomes a string
+        else {
+          parsedValue = trimmed;
+          newType = "string";
+        }
+
+        // Update the data using the current path
+        const parts = this.parsePath(currentPath);
+        this.setValueAtPath(parts, parsedValue);
+        this.syncEditorFromTree();
+
+        // Re-render tree if type changed (to get correct UI like checkbox for boolean, or expandable for array/object)
+        if (
+          oldType !== newType ||
+          newType === "array" ||
+          newType === "object"
+        ) {
+          this.renderTree();
+        } else {
+          // Just update display
+          span.dataset.type = newType;
+          span.className = "tree-value " + newType;
+          span.textContent = this.formatValue(parsedValue, newType);
+        }
+      }
+
+      addNewItem(path, type, data) {
+        const parts = this.parsePath(path);
+        const target = parts.length
+          ? this.getValueAtPath(parts)
+          : this.jsonData;
+
+        if (type === "array") {
+          target.push(null);
+        } else {
+          // Find a unique key name
+          let keyNum = 1;
+          let newKey = "newKey";
+          while (newKey in target) {
+            newKey = `newKey${keyNum++}`;
+          }
+          target[newKey] = null;
+        }
+
+        this.syncEditorFromTree();
+        this.renderTree();
+      }
+
+      handleBooleanEdit(e, path, checkbox) {
+        const span = e.target;
+        const newValue = span.textContent.trim();
+
+        // Get current path from DOM (in case key was renamed)
+        const currentPath = this.getPathFromElement(span);
+        const parts = this.parsePath(currentPath);
+
+        if (newValue === "true") {
+          this.setValueAtPath(parts, true);
+          checkbox.checked = true;
+          span.textContent = "true";
+        } else if (newValue === "false") {
+          this.setValueAtPath(parts, false);
+          checkbox.checked = false;
+          span.textContent = "false";
+        } else if (newValue === "" || newValue === "null") {
+          // Convert to null
+          this.setValueAtPath(parts, null);
+          this.renderTree(); // Re-render since type changed
+        } else {
+          // Convert to string
+          this.setValueAtPath(parts, newValue);
+          this.renderTree(); // Re-render since type changed
+        }
+
+        this.syncEditorFromTree();
+      }
+
+      getPathFromElement(element) {
+        // Build path by traversing up the DOM tree
+        const pathParts = [];
+        let current = element.closest('.tree-node');
+
+        while (current) {
+          const treeItem = current.querySelector('.tree-item');
+          if (!treeItem) break;
+
+          // Check if it's an array index or object key
+          const indexSpan = treeItem.querySelector('.tree-index');
+          const keySpan = treeItem.querySelector('.tree-key');
+
+          if (indexSpan) {
+            // Array index
+            const indexText = indexSpan.textContent;
+            const match = indexText.match(/\[(\d+)\]/);
+            if (match) {
+              pathParts.unshift({ type: 'array', value: parseInt(match[1]) });
+            }
+          } else if (keySpan) {
+            // Object key
+            const key = keySpan.textContent.trim();
+            pathParts.unshift({ type: 'object', value: key });
+          } else {
+            // Root element
+            break;
+          }
+
+          // Move to parent tree node
+          const parentContainer = current.parentElement?.closest('.tree-node');
+          if (!parentContainer || parentContainer === current) break;
+          current = parentContainer;
+        }
+
+        // Build path string
+        if (pathParts.length === 0) return '$';
+
+        let path = '$';
+        for (const part of pathParts) {
+          if (part.type === 'array') {
+            path += `[${part.value}]`;
+          } else {
+            path += `.${part.value}`;
+          }
+        }
+
+        return path;
+      }
+
+      handleKeyEdit(e, path) {
+        const span = e.target;
+        const newKey = span.textContent.trim();
+        const oldKey = span.dataset.originalKey;
+
+        if (newKey === oldKey || !newKey) {
+          span.textContent = oldKey;
+          return;
+        }
+
+        const parts = this.parsePath(path);
+        const parentParts = parts.slice(0, -1);
+        const parent = parentParts.length
+          ? this.getValueAtPath(parentParts)
+          : this.jsonData;
+
+        if (parent && typeof parent === "object" && !Array.isArray(parent)) {
+          const value = parent[oldKey];
+          delete parent[oldKey];
+          parent[newKey] = value;
+          span.dataset.originalKey = newKey;
+
+          // Update the path display - use the value element to get the correct path
+          const treeNode = span.closest('.tree-node');
+          if (treeNode) {
+            // Get the value element to calculate path from
+            const valueElement = treeNode.querySelector('.tree-value') ||
+              treeNode.querySelector('.bool-label') ||
+              span;
+            const newPath = this.getPathFromElement(valueElement);
+            this.pathValue.textContent = newPath;
+            this.currentPath = newPath;
+          }
+
+          this.syncEditorFromTree();
+        }
+      }
+
+      syncEditorFromTree() {
+        this.isUpdating = true;
+        this.editor.value = JSON.stringify(this.jsonData, null, 2);
+        this.updateStats(this.editor.value);
+        this.isUpdating = false;
+      }
+
+      // ============================================
+      // UI State
+      // ============================================
+
+      setStatus(state, message) {
+        this.statusDot.className = "status-dot " + state;
+        this.statusText.textContent = message;
+      }
+
+      showEmptyState() {
+        this.emptyState.style.display = "flex";
+        const tree = this.treeContainer.querySelector(".tree-node");
+        if (tree) tree.remove();
+      }
+
+      showTreeError(error) {
+        this.emptyState.style.display = "none";
+        const existingTree = this.treeContainer.querySelector(".tree-node");
+        if (existingTree) existingTree.remove();
+
+        const errorDiv = document.createElement("div");
+        errorDiv.className = "error-display";
+        errorDiv.textContent = "❌ Parse Error:\n" + error;
+
+        const existingError =
+          this.treeContainer.querySelector(".error-display");
+        if (existingError) existingError.remove();
+
+        this.treeContainer.appendChild(errorDiv);
+      }
+
+      // ============================================
+      // Clipboard Handling
+      // ============================================
+
+      async checkClipboard() {
+        // Only check once
+        if (this.clipboardChecked) return;
+        this.clipboardChecked = true;
+
+        try {
+          const text = await navigator.clipboard.readText();
+          if (!text || !text.trim()) return;
+
+          const result = this.parseJSON(text);
+
+          if (result.success) {
+            this.clipboardJSON = text;
+            this.clipboardPreview.textContent = text.substring(0, 500);
+            this.clipboardBanner.classList.add("show");
+          }
+        } catch (e) {
+          // Clipboard access denied or empty - silently fail
+        }
+      }
+
+      async pasteFromClipboard() {
+        try {
+          const text = await navigator.clipboard.readText();
+          this.editor.value = text;
+          this.handleEditorInput();
+          this.clipboardBanner.classList.remove("show");
+          this.showToast("Pasted from clipboard", "success");
+        } catch (e) {
+          this.showToast("Could not access clipboard", "error");
+        }
+      }
+
+      pasteDetectedJSON() {
+        if (this.clipboardJSON) {
+          this.editor.value = this.clipboardJSON;
+          this.handleEditorInput();
+          this.clipboardBanner.classList.remove("show");
+          this.showToast("JSON pasted successfully", "success");
+        }
+      }
+
+      dismissClipboardBanner() {
+        this.clipboardBanner.classList.remove("show");
+      }
+
+      async copyToClipboard() {
+        const text = this.editor.value;
+        if (!text) {
+          this.showToast("Nothing to copy", "info");
+          return;
+        }
+
+        try {
+          await navigator.clipboard.writeText(text);
+          this.showToast("Copied to clipboard", "success");
+        } catch (e) {
+          this.showToast("Could not copy to clipboard", "error");
+        }
+      }
+
+      // ============================================
+      // JSON Operations
+      // ============================================
+
+      formatJSON() {
+        if (!this.jsonData) {
+          this.showToast("No valid JSON to format", "error");
+          return;
+        }
+
+        this.isUpdating = true;
+        this.editor.value = JSON.stringify(this.jsonData, null, 2);
+        this.updateStats(this.editor.value);
+        this.isUpdating = false;
+        this.showToast("JSON formatted", "success");
+      }
+
+      minifyJSON() {
+        if (!this.jsonData) {
+          this.showToast("No valid JSON to minify", "error");
+          return;
+        }
+
+        this.isUpdating = true;
+        this.editor.value = JSON.stringify(this.jsonData);
+        this.updateStats(this.editor.value);
+        this.isUpdating = false;
+        this.showToast("JSON minified", "success");
+      }
+
+      downloadJSON() {
+        const text = this.editor.value;
+        if (!text) {
+          this.showToast("Nothing to download", "info");
+          return;
+        }
+
+        const blob = new Blob([text], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "data.json";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        this.showToast("Downloaded as data.json", "success");
+      }
+
+      clearAll() {
+        this.editor.value = "";
+        this.jsonData = null;
+        this.setStatus("", "Ready");
+        this.showEmptyState();
+        this.updateStats("");
+        this.pathValue.textContent = "$";
+        this.searchInput.value = "";
+
+        const errorDisplay =
+          this.treeContainer.querySelector(".error-display");
+        if (errorDisplay) errorDisplay.remove();
+
+        this.showToast("Cleared", "info");
+      }
+
+      loadSample() {
+        const sample = {
+          name: "JSON Tool",
+          version: "1.0.0",
+          description: "A powerful JSON viewer and editor",
+          features: [
+            "Format & minify",
+            "Tree view",
+            "Live editing",
+            "Search & filter",
+            "Copy & download",
+          ],
+          settings: {
+            theme: "dark",
+            autoFormat: true,
+            expandDepth: 3,
+          },
+          stats: {
+            users: 1000,
+            rating: 4.8,
+            isActive: true,
+            lastUpdate: null,
+          },
+          nested: {
+            level1: {
+              level2: {
+                level3: {
+                  value: "Deep nesting example",
+                },
+              },
+            },
+          },
+        };
+
+        this.editor.value = JSON.stringify(sample, null, 2);
+        this.handleEditorInput();
+        this.showToast("Sample JSON loaded", "success");
+      }
+
+      // ============================================
+      // Search
+      // ============================================
+
+      handleSearch() {
+        const query = this.searchInput.value.toLowerCase().trim();
+        const items = this.treeContainer.querySelectorAll(".tree-item");
+
+        items.forEach((item) => {
+          item.classList.remove("highlight");
+        });
+
+        if (!query) return;
+
+        items.forEach((item) => {
+          const text = item.textContent.toLowerCase();
+          if (text.includes(query)) {
+            item.classList.add("highlight");
+
+            // Expand parent nodes
+            let parent = item.closest(".tree-children");
+            while (parent) {
+              parent.classList.remove("collapsed");
+              const toggle =
+                parent.previousElementSibling?.querySelector(".tree-toggle");
+              if (toggle) {
+                toggle.classList.remove("collapsed");
+                toggle.classList.add("expanded");
+              }
+              parent = parent.parentElement?.closest(".tree-children");
+            }
+          }
+        });
+      }
+
+      // ============================================
+      // Expand/Collapse
+      // ============================================
+
+      expandAll() {
+        const toggles = this.treeContainer.querySelectorAll(".tree-toggle");
+        const children =
+          this.treeContainer.querySelectorAll(".tree-children");
+
+        toggles.forEach((t) => {
+          t.classList.remove("collapsed");
+          t.classList.add("expanded");
+        });
+
+        children.forEach((c) => c.classList.remove("collapsed"));
+      }
+
+      collapseAll() {
+        const toggles = this.treeContainer.querySelectorAll(".tree-toggle");
+        const children =
+          this.treeContainer.querySelectorAll(".tree-children");
+
+        toggles.forEach((t) => {
+          t.classList.remove("expanded");
+          t.classList.add("collapsed");
+        });
+
+        children.forEach((c) => c.classList.add("collapsed"));
+      }
+
+      // ============================================
+      // Context Menu
+      // ============================================
+
+      showContextMenu(e, path, data) {
+        this.contextMenuTarget = { path, data };
+        this.contextMenu.style.left = e.pageX + "px";
+        this.contextMenu.style.top = e.pageY + "px";
+        this.contextMenu.classList.add("show");
+      }
+
+      hideContextMenu() {
+        this.contextMenu.classList.remove("show");
+      }
+
+      async handleContextMenuClick(e) {
+        const action = e.target.dataset.action;
+        if (!action || !this.contextMenuTarget) return;
+
+        const { path, data } = this.contextMenuTarget;
+
+        switch (action) {
+          case "copy-value":
+            const valueToCopy =
+              typeof data === "object"
+                ? JSON.stringify(data, null, 2)
+                : String(data);
+            await navigator.clipboard.writeText(valueToCopy);
+            this.showToast("Value copied", "success");
+            break;
+          case "copy-path":
+            await navigator.clipboard.writeText(path);
+            this.showToast("Path copied", "success");
+            break;
+          case "delete":
+            this.deleteAtPath(path);
+            break;
+          case "add-property":
+            this.showToast(
+              "Click on a value to edit, or modify the raw JSON",
+              "info"
+            );
+            break;
+        }
+
+        this.hideContextMenu();
+      }
+
+      deleteAtPath(path) {
+        const parts = this.parsePath(path);
+        if (parts.length === 0) {
+          this.clearAll();
+          return;
+        }
+
+        const parentParts = parts.slice(0, -1);
+        const key = parts[parts.length - 1];
+        const parent = parentParts.length
+          ? this.getValueAtPath(parentParts)
+          : this.jsonData;
+
+        if (Array.isArray(parent)) {
+          parent.splice(key, 1);
+        } else if (typeof parent === "object") {
+          delete parent[key];
+        }
+
+        this.syncEditorFromTree();
+        this.renderTree();
+        this.showToast("Deleted", "success");
+      }
+
+      // ============================================
+      // Resizer
+      // ============================================
+
+      initResizer() {
+        let isResizing = false;
+        const leftPanel = document.querySelector(".panel-left");
+        const rightPanel = document.querySelector(".panel-right");
+
+        this.resizer.addEventListener("mousedown", (e) => {
+          isResizing = true;
+          this.resizer.classList.add("active");
+        });
+
+        document.addEventListener("mousemove", (e) => {
+          if (!isResizing) return;
+
+          const containerRect = document
+            .querySelector(".main-container")
+            .getBoundingClientRect();
+          const percentage =
+            ((e.clientX - containerRect.left) / containerRect.width) * 100;
+
+          if (percentage > 20 && percentage < 80) {
+            leftPanel.style.flex = `0 1 ${percentage}%`;
+            rightPanel.style.flex = `0 1 ${100 - percentage}%`;
+          }
+        });
+
+        document.addEventListener("mouseup", () => {
+          isResizing = false;
+          this.resizer.classList.remove("active");
+        });
+      }
+
+      // ============================================
+      // Keyboard Shortcuts
+      // ============================================
+
+      handleKeydown(e) {
+        // Ctrl/Cmd + Shift + F - Format
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "F") {
+          e.preventDefault();
+          this.formatJSON();
+        }
+
+        // Ctrl/Cmd + F - Focus search
+        if ((e.ctrlKey || e.metaKey) && e.key === "f" && !e.shiftKey) {
+          if (document.activeElement !== this.editor) {
+            e.preventDefault();
+            this.searchInput.focus();
+          }
+        }
+
+        // Ctrl/Cmd + Z - Undo
+        if ((e.ctrlKey || e.metaKey) && e.key === "z" && !e.shiftKey) {
+          if (document.activeElement === this.editor) {
+            // Let browser handle it
+          }
+        }
+
+        // Escape - Clear search
+        if (e.key === "Escape") {
+          this.searchInput.value = "";
+          this.handleSearch();
+          this.searchInput.blur();
+        }
+      }
+
+      // ============================================
+      // Toast Notifications
+      // ============================================
+
+      showToast(message, type = "info") {
+        const toast = document.createElement("div");
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+
+        this.toastContainer.appendChild(toast);
+
+        setTimeout(() => {
+          toast.style.opacity = "0";
+          toast.style.transform = "translateX(20px)";
+          setTimeout(() => toast.remove(), 300);
+        }, 2500);
+      }
+    }
+
+    // Initialize the app
+    document.addEventListener("DOMContentLoaded", () => {
+      window.jsonTool = new JSONTool();
+    });
+  </script>
+</body>
+
 </html>
