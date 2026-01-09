@@ -1706,7 +1706,6 @@
         if (this.isUpdating) return;
 
         const text = this.editor.value;
-        this.updateStats(text);
 
         const result = this.parseJSON(text);
 
@@ -1726,6 +1725,8 @@
           this.setStatus("", "Ready");
           this.showEmptyState();
         }
+        
+        this.updateStats(text);
       }
 
       handlePaste() {
