@@ -525,7 +525,7 @@
       font-style: italic;
     }
 
-    .tree-value.null[contenteditable="true"]:empty::before {
+    .tree-value.null[contenteditable]:empty::before {
       content: "null";
       opacity: 0.5;
     }
@@ -614,7 +614,7 @@
     }
 
     /* Editable values */
-    .tree-value[contenteditable="true"] {
+    .tree-value[contenteditable] {
       outline: none;
       padding: 0 4px;
       margin: 0 -4px;
@@ -622,7 +622,7 @@
       min-width: 20px;
     }
 
-    .tree-value[contenteditable="true"]:focus {
+    .tree-value[contenteditable]:focus {
       background: var(--bg-primary);
       box-shadow: 0 0 0 2px var(--accent-blue);
     }
@@ -1800,7 +1800,7 @@
           item.style.cursor = "pointer";
           item.addEventListener("click", (e) => {
             // Don't toggle if clicking on editable content
-            if (e.target.contentEditable === "true") return;
+            if (e.target.contentEditable === "plaintext-only") return;
             this.toggleNode(toggle);
             const currentPath = this.getPathFromElement(item);
             this.pathValue.textContent = currentPath;
@@ -1812,7 +1812,7 @@
           const keySpan = document.createElement("span");
           keySpan.className = "tree-key";
           keySpan.textContent = key;
-          keySpan.contentEditable = true;
+          keySpan.contentEditable = "plaintext-only";
           keySpan.dataset.originalKey = key;
           keySpan.addEventListener("blur", (e) =>
             this.handleKeyEdit(e, path)
@@ -1889,7 +1889,7 @@
             const textSpan = document.createElement("span");
             textSpan.className = "bool-label";
             textSpan.textContent = String(data);
-            textSpan.contentEditable = true;
+            textSpan.contentEditable = "plaintext-only";
             textSpan.dataset.type = type;
             textSpan.addEventListener("blur", (e) =>
               this.handleBooleanEdit(e, checkbox)
@@ -1907,7 +1907,7 @@
             valueSpan.appendChild(textSpan);
           } else {
             valueSpan.textContent = this.formatValue(data, type);
-            valueSpan.contentEditable = true;
+            valueSpan.contentEditable = "plaintext-only";
             valueSpan.dataset.type = type;
             valueSpan.addEventListener("blur", (e) =>
               this.handleValueEdit(e)
