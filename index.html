@@ -1685,14 +1685,69 @@
           fixed = arrayMatch[0];
         }
 
-        // Fix trailing commas
-        fixed = fixed.replace(/,(\s*[}\]])/g, "$1");
+        // Single character-walk rewrite. Tracking string state means the
+        // fixes below can never corrupt the contents of string values.
+        let out = "";
+        let i = 0;
+        while (i < fixed.length) {
+          const ch = fixed[i];
 
-        // Fix single quotes to double quotes (careful with content)
-        // This is a simple fix that might not work for all cases
-        fixed = fixed.replace(/(['"])?([a-zA-Z0-9_]+)(['"])?\s*:/g, '"$2":');
+          // Strings: copy verbatim; single-quoted ones become double-quoted
+          if (ch === '"' || ch === "'") {
+            let body = "";
+            i++;
+            while (i < fixed.length && fixed[i] !== ch) {
+              if (fixed[i] === "\\") {
+                body += fixed[i] + (fixed[i + 1] || "");
+                i += 2;
+              } else {
+                body += fixed[i];
+                i++;
+              }
+            }
+            i++; // skip closing quote
+            if (ch === "'") {
+              body = body.replace(/\\'/g, "'").replace(/"/g, '\\"');
+            }
+            out += '"' + body + '"';
+            continue;
+          }
 
-        return fixed;
+          // Trailing comma: drop it if the next non-whitespace is } or ]
+          if (ch === ",") {
+            let j = i + 1;
+            while (j < fixed.length && /\s/.test(fixed[j])) j++;
+            if (fixed[j] === "}" || fixed[j] === "]") {
+              i++;
+              continue;
+            }
+            out += ch;
+            i++;
+            continue;
+          }
+
+          // Bare word: quote it if it's a key (followed by ':'), otherwise
+          // leave it alone (true/false/null literals, numbers)
+          if (/[\w$]/.test(ch)) {
+            let j = i;
+            while (j < fixed.length && /[\w$]/.test(fixed[j])) j++;
+            let k = j;
+            while (k < fixed.length && /\s/.test(fixed[k])) k++;
+            if (fixed[k] === ":") {
+              out += '"' + fixed.slice(i, j) + '":';
+              i = k + 1;
+            } else {
+              out += fixed.slice(i, j);
+              i = j;
+            }
+            continue;
+          }
+
+          out += ch;
+          i++;
+        }
+
+        return out;
       }
 
       // ============================================
