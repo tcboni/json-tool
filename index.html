@@ -1772,18 +1772,40 @@
           return;
         }
 
+        // Preserve expansion state across re-renders (e.g. after edits)
+        const expandedPaths = new Set();
+        this.treeContainer
+          .querySelectorAll(".tree-node > .tree-children:not(.collapsed)")
+          .forEach((c) => expandedPaths.add(c.parentElement.dataset.path));
+
         this.emptyState.style.display = "none";
         const tree = this.createTreeNode(this.jsonData, "$", null, true);
         this.treeContainer.innerHTML = "";
         this.treeContainer.appendChild(tree);
+
+        if (expandedPaths.size) {
+          this.treeContainer.querySelectorAll(".tree-node").forEach((node) => {
+            if (!expandedPaths.has(node.dataset.path)) return;
+            const toggle = node.querySelector(":scope > .tree-item > .tree-toggle");
+            const children = node.querySelector(":scope > .tree-children");
+            if (toggle && children) {
+              toggle.classList.remove("collapsed");
+              toggle.classList.add("expanded");
+              children.classList.remove("collapsed");
+            }
+          });
+        }
       }
 
-      createTreeNode(data, path, key = null, isRoot = false) {
+      createTreeNode(data, path, key = null, isRoot = false, depth = 0) {
         const container = document.createElement("div");
         container.className = "tree-node";
+        container.dataset.path = path;
 
         const type = this.getType(data);
         const isExpandable = type === "object" || type === "array";
+        // Only the root starts expanded, so the first render shows just top-level keys
+        const startCollapsed = isExpandable && depth >= 1;
 
         const item = document.createElement("div");
         item.className = "tree-item";
@@ -1791,7 +1813,9 @@
         // Toggle button for expandable items
         if (isExpandable) {
           const toggle = document.createElement("span");
-          toggle.className = "tree-toggle expanded";
+          toggle.className = startCollapsed
+            ? "tree-toggle collapsed"
+            : "tree-toggle expanded";
           item.appendChild(toggle);
 
           // Make entire row clickable for expand/collapse
@@ -1960,20 +1984,22 @@
         // Children for expandable items
         if (isExpandable) {
           const children = document.createElement("div");
-          children.className = "tree-children";
+          children.className = startCollapsed
+            ? "tree-children collapsed"
+            : "tree-children";
 
           if (type === "array") {
             data.forEach((child, index) => {
               const childPath = `${path}[${index}]`;
               children.appendChild(
-                this.createTreeNode(child, childPath, index)
+                this.createTreeNode(child, childPath, index, false, depth + 1)
               );
             });
           } else {
             Object.entries(data).forEach(([childKey, child]) => {
               const childPath = `${path}.${childKey}`;
               children.appendChild(
-                this.createTreeNode(child, childPath, childKey)
+                this.createTreeNode(child, childPath, childKey, false, depth + 1)
               );
             });
           }
