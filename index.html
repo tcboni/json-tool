@@ -1650,14 +1650,19 @@
           return { success: false, error: "Empty input" };
         }
 
-        // Try to fix common issues
-        let fixedText = this.tryFixJSON(text);
-
+        // Valid JSON should never be touched by the fixer
         try {
-          const data = JSON.parse(fixedText);
-          return { success: true, data, fixed: fixedText !== text };
-        } catch (e) {
-          return { success: false, error: e.message };
+          const data = JSON.parse(text);
+          return { success: true, data, fixed: false };
+        } catch (originalError) {
+          const fixedText = this.tryFixJSON(text);
+          try {
+            const data = JSON.parse(fixedText);
+            return { success: true, data, fixed: fixedText !== text };
+          } catch (e) {
+            // Report the error from the original input, not the mangled one
+            return { success: false, error: originalError.message };
+          }
         }
       }
 
